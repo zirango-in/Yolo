@@ -200,6 +200,22 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Data in `lib/data/support_providers.dart` (Laravel: POST/GET /support/tickets).
 - Tests: `test/support_test.dart`; all 17 tests passing.
 
-## NEXT: Step 17 — Music & singing (games are LAST, per owner)
-Music page, karaoke, song list, popular songs, song search, singing room, singing battle, mic selection,
-singer queue, singing results, music upload. (Real songs need licensed music.)
+## Step 17 done — Music & singing
+- Music page (Home → Music): modes (Karaoke, Singing room, Battle, Mic grab), search, Popular (ranked) /
+  All / Favorites / My uploads, preview mini player, my performances.
+- Karaoke: synced lyrics (line highlight), live pitch meter, progress, mic selection (phone / headset /
+  bluetooth) + voice effects, pause/resume, finish → results (grade S/A/B/C, score, stars, coins, sing again).
+- Singing room: now-singing card, cheer, next singer, singer queue, join with a song, leave.
+- Singing battle: two singers, live votes, 10 s countdown, vote once, winner card, challenge the winner.
+- Mic grab: 3 rounds, false-start detection, reaction time, bots, coins for wins (also playable from Game Center).
+- Upload music: audio file picker (file_picker), title, genre, rights confirmation, goes to review.
+- 8 demo songs with ORIGINAL placeholder lyrics. Real songs need a licensed karaoke catalogue; real
+  audio playback / recording / pitch detection need audio packages + backend.
+- Tests: `test/music_test.dart`; all 18 tests passing.
+
+## ALL APP SECTIONS 1–15 + 17 DONE (demo data). Remaining:
+1. Games (owner chose to do last): Ludo, Draw & Guess, Who Is Spy, Werewolf, Star Impostor, Reversi,
+   Bingo, Wild Cards, Bluff Party, Color Hide, Llama Dash, Trick Café, Jackaroo.
+2. Laravel + MySQL backend and connecting the app (switch AppConfig.useDemoData), Agora voice,
+   SMS OTP, Google Play Billing, FCM push, file uploads.
+3. Admin panel. 4. Translations (ARB files). 5. Release build (signing, Play Store listing).

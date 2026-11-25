@@ -27,7 +27,9 @@ import 'features/messages/messages_screen.dart';
 import 'features/moments/create_post_screen.dart';
 import 'features/moments/moments_screen.dart';
 import 'data/demo_content.dart';
+import 'features/music/music_pages.dart';
 import 'features/notifications/notifications_screen.dart';
+import 'data/music_providers.dart';
 import 'features/profile/avatar_studio_screen.dart';
 import 'features/profile/edit_profile_screen.dart';
 import 'features/profile/level_badges_screens.dart';
@@ -110,6 +112,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/events', builder: (_, _) => const EventsScreen()),
       GoRoute(path: '/events/detail', builder: (_, state) => EventDetailScreen(event: state.extra! as EventInfo)),
       GoRoute(path: '/missions', builder: (_, _) => const MissionsScreen()),
+      GoRoute(path: '/music', builder: (_, _) => const MusicScreen()),
+      GoRoute(path: '/music/karaoke', builder: (_, state) => KaraokeScreen(song: state.extra as Song?)),
+      GoRoute(path: '/music/result', builder: (_, state) => SingResultScreen(result: state.extra! as SingResult)),
+      GoRoute(path: '/music/room', builder: (_, _) => const SingingRoomScreen()),
+      GoRoute(path: '/music/battle', builder: (_, _) => const SingingBattleScreen()),
+      GoRoute(path: '/music/micgrab', builder: (_, _) => const MicGrabScreen()),
+      GoRoute(path: '/music/upload', builder: (_, _) => const UploadMusicScreen()),
       GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
       GoRoute(path: '/gifts', builder: (_, _) => const GiftStoreScreen()),
       GoRoute(path: '/gifts/history', builder: (_, _) => const GiftHistoryScreen()),

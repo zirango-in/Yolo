@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/theme.dart';
 import '../../data/demo_content.dart';
 import '../../widgets/page_kit.dart';
+import '../music/music_pages.dart';
 
 /// Game Center. Games themselves are built in a later phase (see docs/ROADMAP.md).
 class GameCenterScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class GameCenterScreen extends StatelessWidget {
         final g = demoGames[i];
         return InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => showYoloToast(context, '${g.name} is coming soon'),
+          onTap: () => g.id == 'micgrab' ? Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const MicGrabScreen())) : showYoloToast(context, '${g.name} is coming soon'),
           child: Column(children: [
             Expanded(
               child: Stack(children: [
@@ -38,7 +39,7 @@ class GameCenterScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(color: YoloColors.bg.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(8)),
-                    child: const Text('SOON', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: YoloColors.gold)),
+                    child: Text(g.id == 'micgrab' ? 'PLAY' : 'SOON', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: YoloColors.gold)),
                   ),
                 ),
               ]),

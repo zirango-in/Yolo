@@ -47,7 +47,7 @@ void main() {
     }
 
     // Home quick entries are visible.
-    for (final label in ['Discover', 'Events', 'Shop', 'Family', 'Moments', 'Friends']) {
+    for (final label in ['Discover', 'Events', 'Shop', 'Family', 'Moments', 'Music']) {
       expect(find.text(label), findsWidgets);
     }
 

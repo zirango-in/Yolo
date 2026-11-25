@@ -128,7 +128,7 @@ Start · Game Interface · Turns · Game Chat · Results · Winner · Rewards ·
 - [ ] Who Is Spy
 - [ ] Werewolf
 - [ ] Space Werewolf → (Yolo: **Star Impostor**)
-- [ ] Mic Grab
+- [x] Mic Grab (built with music: 3 rounds vs bots)
 - [ ] Oh My Card → (Yolo: **Wild Cards**, UNO-style)
 - [ ] Liar's Party → (Yolo: **Bluff Party**)
 - [ ] Paint Hide & Seek → (Yolo: **Color Hide**)
@@ -141,7 +141,7 @@ Online multiplayer for games needs the Laravel realtime server [api]; until then
 against computer players / pass-and-play.
 
 ## Step 17 — Music & Singing
-- [ ] Music Page · Karaoke · Mic Grab · Song List · Popular Songs · Song Search
-- [ ] Singing Room · Singing Battle · Mic Selection · Singer Queue · Singing Results
-- [ ] Music Upload
+- [x] Music Page · Karaoke · Mic Grab · Song List · Popular Songs · Song Search
+- [x] Singing Room · Singing Battle · Mic Selection · Singer Queue · Singing Results
+- [x] Music Upload
 - Note: real songs need licensed music; demo uses placeholder tracks.
