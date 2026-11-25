@@ -127,7 +127,7 @@ class RecoveryScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         GlassCard(
-          onTap: () => showYoloToast(context, 'Customer service opens in Step 15'),
+          onTap: () => context.push('/support/chat'),
           child: const Row(children: [
             TintIcon(Icons.support_agent_rounded, color: Color(0xFFF5C451)),
             SizedBox(width: 12),

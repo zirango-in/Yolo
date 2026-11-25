@@ -113,9 +113,9 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Cache / Storage · Logout
 
 ## Step 15 — Safety & Support
-- [ ] Help Center · Customer Service · Feedback · Bug Report
-- [ ] Report User / Room / Post / Game Issue · Block User
-- [ ] Safety Guidelines · Privacy Policy · Terms of Service · Account Deletion
+- [x] Help Center · Customer Service · Feedback · Bug Report
+- [x] Report User / Room / Post / Game Issue · Block User
+- [x] Safety Guidelines · Privacy Policy · Terms of Service · Account Deletion
 
 ## Step 16+ — Games (one game per step, each fully playable) — LATER, after all app features (owner's decision)
 Shared screens for every game: Lobby · Create · Join · Matchmaking · Player List · Rules · Settings ·

@@ -188,6 +188,18 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Android manifest now declares INTERNET, RECORD_AUDIO, CAMERA, READ_MEDIA_*, location, POST_NOTIFICATIONS.
 - Tests: `test/settings_test.dart`; all 16 tests passing.
 
-## NEXT: Step 15 — Safety & support
-Help center (FAQ), customer service chat, feedback, bug report, report user / room / post / game issue,
-block user, safety guidelines, privacy policy, terms of service, account deletion.
+## Step 15 done — Safety & support
+- Help center (Settings → Help center): FAQ in 4 categories with search + expandable answers, quick actions,
+  safety & legal links, delete account link, my tickets.
+- Customer service chat: quick-reply chips, keyword bot answers (payments, bans, login), "human/agent" creates
+  a Support ticket (agents answer from the admin panel later). Reachable when logged out from account recovery.
+- Feedback (stars + topic + text), Bug report (area, steps, optional screenshot, device info toggle),
+  Report an issue (User / Room / Post / Game issue + ID + reason + details), My tickets with status.
+- Safety guidelines, Privacy policy and Terms of service pages. Privacy & Terms are TEMPLATES with
+  [COMPANY NAME] / [ADDRESS] / [CONTACT EMAIL] / [COUNTRY] placeholders — must be replaced and reviewed by a lawyer.
+- Data in `lib/data/support_providers.dart` (Laravel: POST/GET /support/tickets).
+- Tests: `test/support_test.dart`; all 17 tests passing.
+
+## NEXT: Step 17 — Music & singing (games are LAST, per owner)
+Music page, karaoke, song list, popular songs, song search, singing room, singing battle, mic selection,
+singer queue, singing results, music upload. (Real songs need licensed music.)

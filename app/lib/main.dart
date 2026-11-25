@@ -38,6 +38,7 @@ import 'features/room/room_screen.dart';
 import 'features/settings/settings_pages.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/shop/shop_screen.dart';
+import 'features/support/support_pages.dart';
 import 'features/vip/vip_pages.dart';
 import 'features/wallet/wallet_pages.dart';
 
@@ -57,7 +58,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final loggedIn = ref.read(sessionProvider) != null;
       final loc = state.matchedLocation;
-      final public = loc == '/welcome' || loc.startsWith('/login');
+      final public = loc == '/welcome' || loc.startsWith('/login') || loc.startsWith('/legal') || loc.startsWith('/support');
       if (!loggedIn && !public) return '/welcome';
       return null;
     },
@@ -131,6 +132,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/settings/display', builder: (_, _) => const DisplaySettingsScreen()),
       GoRoute(path: '/settings/permissions', builder: (_, _) => const PermissionsScreen()),
       GoRoute(path: '/settings/storage', builder: (_, _) => const StorageScreen()),
+      GoRoute(path: '/support', builder: (_, _) => const HelpCenterScreen()),
+      GoRoute(path: '/support/chat', builder: (_, _) => const CustomerServiceScreen()),
+      GoRoute(path: '/support/feedback', builder: (_, _) => const FeedbackScreen()),
+      GoRoute(path: '/support/bug', builder: (_, _) => const BugReportScreen()),
+      GoRoute(path: '/support/report', builder: (_, _) => const ReportIssueScreen()),
+      GoRoute(path: '/support/tickets', builder: (_, _) => const TicketsScreen()),
+      GoRoute(path: '/legal/:page', builder: (_, state) => LegalScreen(page: state.pathParameters['page']!)),
     ],
   );
 });
