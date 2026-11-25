@@ -12,6 +12,7 @@ class YoloAvatar extends StatelessWidget {
     this.size = 60,
     this.goldFrame = false,
     this.speaking = false,
+    this.plain = false,
   });
 
   final YoloUser user;
@@ -19,8 +20,20 @@ class YoloAvatar extends StatelessWidget {
   final bool goldFrame;
   final bool speaking;
 
+  /// No frame or outline: just the round picture.
+  final bool plain;
+
   @override
   Widget build(BuildContext context) {
+    if (plain) {
+      return Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: user.avatarColors, begin: Alignment.topLeft, end: Alignment.bottomRight)),
+        child: Text(user.initial, style: TextStyle(fontSize: size * 0.38, fontWeight: FontWeight.w800, color: Colors.white)),
+      );
+    }
     final ring = goldFrame || speaking;
     final avatar = Container(
       width: size,

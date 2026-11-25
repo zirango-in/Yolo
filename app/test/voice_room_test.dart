@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'package:yolo/data/models.dart';
 import 'package:yolo/data/providers.dart';
+import 'package:yolo/data/repository.dart';
 import 'package:yolo/main.dart';
 
 Future<void> settle(WidgetTester t, [int frames = 12]) async {
@@ -54,6 +56,30 @@ void main() {
     expect(find.textContaining('Level '), findsWidgets);
     expect(find.text('Follow'), findsNothing);
     expect(find.bySemanticsLabel('Back'), findsNothing);
+
+    // Chat: system note, then the announcement, then my entry notice — all in the scrolling list
+    expect(find.textContaining('Announcement:'), findsOneWidget);
+    expect(st().messages.where((m) => m.kind == MessageKind.entry).length, 1);
+    final ctl = c.read(roomProvider(room).notifier);
+    ctl.userEntered(DemoUsers.leo);
+    ctl.userEntered(DemoUsers.leo); // quick re-join: no duplicate notice
+    await settle(tester);
+    expect(st().messages.where((m) => m.kind == MessageKind.entry && m.senderId == DemoUsers.leo.id).length, 1);
+
+    // Top contributors come from the room's real gifting totals (Zara leads)
+    expect(ctl.topGifters().first.$1.id, DemoUsers.zara.id);
+
+    // Four-dot menu holds every room feature, including Red packet and Music
+    await tester.tap(find.bySemanticsLabel('More features'));
+    await settle(tester);
+    for (final label in ['Red packet', 'Music', 'Settings', 'Room info', 'Room level', 'Members', 'Invite', 'Ranking']) {
+      expect(find.text(label), findsOneWidget, reason: label);
+    }
+    await tester.tap(find.text('Music'));
+    await settle(tester);
+    expect(find.textContaining('Music'), findsWidgets);
+    await tester.tapAt(const Offset(195, 60));
+    await settle(tester, 30);
 
     // Owner: lock an empty seat; mute, make admin, remove Zara from mic
     await tester.tap(find.bySemanticsLabel('Take seat 8'));
@@ -177,7 +203,7 @@ void main() {
 
     // Red packet: send 100 coins in 5 shares, then grab one
     final before = coins();
-    await tester.tap(find.bySemanticsLabel('Room tools'));
+    await tester.tap(find.bySemanticsLabel('More features'));
     await settle(tester);
     await tester.tap(find.text('Red packet'));
     await settle(tester);

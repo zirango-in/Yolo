@@ -190,7 +190,7 @@ void main() {
       await settle(tester);
       await closeTop();
       await settle(tester);
-      for (final label in ['Interactions', 'Room tools', 'Treasure boxes']) {
+      for (final label in ['Interactions', 'More features', 'Treasure boxes']) {
         current = 'room:$label';
         await tester.tap(find.bySemanticsLabel(label), warnIfMissed: false);
         await settle(tester);

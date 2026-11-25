@@ -71,9 +71,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     _input.selection = TextSelection.collapsed(offset: text.length);
   }
 
-  void _scrollToEnd() => WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent, duration: 250.ms, curve: Curves.easeOut);
-      });
+  /// Messages already shown once, so their entry animation never replays while scrolling.
+  final _animated = <int>{};
+  late final int _firstLiveIndex = ref.read(roomProvider(room)).messages.length; // older history appears without animation
+
+  /// Follow new messages only when the reader is already at the bottom (or wrote it themselves),
+  /// so someone reading older messages is never yanked down.
+  void _onNewMessage({required bool mine}) {
+    if (!_scroll.hasClients) return;
+    final pos = _scroll.position;
+    final nearBottom = pos.maxScrollExtent - pos.pixels < 120;
+    if (!nearBottom && !mine) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent, duration: 250.ms, curve: Curves.easeOut);
+    });
+  }
 
   void _toast(String msg) => showYoloToast(context, msg);
 
@@ -142,62 +154,69 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     );
   }
 
-  /// Toolbox: room tools.
-  void _tools() {
+  /// Four-dot menu: every room feature in one compact icon grid.
+  void _menuGrid() {
+    final manage = ctrl.canManage;
+    final items = <(IconData, String, Color, VoidCallback)>[
+      (Icons.mail_rounded, 'Red packet', const Color(0xFFEF4444), () => showRedPacketSheet(context, ref, room)),
+      (Icons.library_music_rounded, 'Music', const Color(0xFFF9A8D4), () => manage ? showMusicSheet(context, ref, room) : _toast('Only admins can play room music')),
+      if (manage) (Icons.tune_rounded, 'Settings', YoloColors.gold, () => context.push('/room/settings', extra: room)),
+      (Icons.info_outline_rounded, 'Room info', const Color(0xFFC4B5FD), () => showRoomInfoSheet(context, ref, room)),
+      (Icons.workspace_premium_rounded, 'Room level', const Color(0xFFC084FC), () => context.push('/room/level', extra: room)),
+      (Icons.people_alt_rounded, 'Members', const Color(0xFF7DD3FC), () => showMembersSheet(context, ref, room)),
+      (Icons.person_add_alt_1_rounded, 'Invite', const Color(0xFF86EFAC), () => showInviteSheet(context, ref, room)),
+      (Icons.leaderboard_rounded, 'Ranking', const Color(0xFFFDE68A), () => showMembersSheet(context, ref, room, tab: 2)),
+    ];
     showRoomSheet<void>(context, (c) {
-      Widget item(IconData icon, String label, Color color, VoidCallback onTap) => SizedBox(
-            width: 80,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                Navigator.pop(c);
-                onTap();
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(children: [TintIcon(icon, color: color, size: 48), const SizedBox(height: 6), Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12))]),
-              ),
-            ),
-          );
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(spacing: 4, runSpacing: 8, children: [
-          item(Icons.mail_rounded, 'Red packet', const Color(0xFFEF4444), () => showRedPacketSheet(context, ref, room)),
-          item(Icons.library_music_rounded, 'Music', const Color(0xFFF9A8D4), () => ctrl.canManage ? showMusicSheet(context, ref, room) : _toast('Only admins can play room music')),
-        ]),
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+          child: GridView.count(
+            crossAxisCount: 4,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 6,
+            childAspectRatio: 0.95,
+            children: [
+              for (final (icon, label, color, onTap) in items)
+                InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    Navigator.pop(c);
+                    onTap();
+                  },
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    TintIcon(icon, color: color, size: 46),
+                    const SizedBox(height: 6),
+                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)),
+                  ]),
+                ),
+            ],
+          ),
+        ),
       );
     });
   }
 
+  /// Header ••• menu: leaving / minimizing and reporting.
   void _more() {
-    final manage = ctrl.canManage;
     showRoomSheet<void>(context, (c) {
-      Widget item(IconData icon, String label, VoidCallback onTap, {Color color = YoloColors.textSoft}) => SizedBox(
-            width: 80,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                Navigator.pop(c);
-                onTap();
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(children: [TintIcon(icon, color: color, size: 48), const SizedBox(height: 6), Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12))]),
-              ),
-            ),
+      Widget tile(IconData icon, String label, Color color, VoidCallback onTap) => ListTile(
+            leading: Icon(icon, color: color),
+            title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+            onTap: () {
+              Navigator.pop(c);
+              onTap();
+            },
           );
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(spacing: 4, runSpacing: 8, children: [
-          item(Icons.picture_in_picture_alt_rounded, 'Minimize', _minimize, color: const Color(0xFF86EFAC)),
-          if (manage) item(Icons.tune_rounded, 'Settings', () => context.push('/room/settings', extra: room), color: YoloColors.gold),
-          item(Icons.info_outline_rounded, 'Room info', () => showRoomInfoSheet(context, ref, room), color: const Color(0xFFC4B5FD)),
-          item(Icons.workspace_premium_rounded, 'Room level', () => context.push('/room/level', extra: room), color: const Color(0xFFC084FC)),
-          item(Icons.people_alt_rounded, 'Members', () => showMembersSheet(context, ref, room), color: const Color(0xFF7DD3FC)),
-          item(Icons.person_add_alt_1_rounded, 'Invite', () => showInviteSheet(context, ref, room), color: const Color(0xFF86EFAC)),
-          item(Icons.leaderboard_rounded, 'Ranking', () => showMembersSheet(context, ref, room, tab: 2), color: const Color(0xFFFDE68A)),
-          item(Icons.flag_rounded, 'Report', () => showReportSheet(context, 'room'), color: const Color(0xFFF87171)),
-          item(Icons.logout_rounded, 'Exit', _exit),
+      return SafeArea(
+        top: false,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 8),
+          tile(Icons.picture_in_picture_alt_rounded, 'Minimize', const Color(0xFF86EFAC), _minimize),
+          tile(Icons.flag_rounded, 'Report', const Color(0xFFF87171), () => showReportSheet(context, 'room')),
+          tile(Icons.logout_rounded, 'Exit', YoloColors.textSoft, _exit),
         ]),
       );
     });
@@ -229,7 +248,9 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     ].isNotEmpty;
     final chatLocked = st.banText && !ctrl.canManage;
 
-    ref.listen(roomProvider(room).select((s) => s.messages.length), (_, _) => _scrollToEnd());
+    ref.listen(roomProvider(room).select((s) => s.messages.length), (prev, next) {
+      if (next > (prev ?? 0)) _onNewMessage(mine: ref.read(roomProvider(room)).messages.last.senderId == meId);
+    });
 
     Widget seatTile(Seat s, {double? size}) => _SeatTile(
           seat: s,
@@ -261,12 +282,8 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                           behavior: HitTestBehavior.opaque,
                           onTap: () => showRoomInfoSheet(context, ref, room),
                           child: Row(children: [
-                            Container(
-                              padding: const EdgeInsets.all(1.5),
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(13), border: Border.all(color: YoloColors.gold.withValues(alpha: 0.7))),
-                              child: RoomCover(room: room, name: st.name, coverPath: st.coverPath, size: 46, radius: 12),
-                            ),
-                            const SizedBox(width: 8),
+                            RoomCover(room: room, name: st.name, coverPath: st.coverPath, size: 44, radius: 12),
+                            const SizedBox(width: 10),
                             Flexible(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                                 Row(mainAxisSize: MainAxisSize.min, children: [
@@ -380,28 +397,6 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                     children: [for (final s in gridSeats) seatTile(s)],
                   ),
                 ),
-                // Announcement
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                  child: InkWell(
-                    onTap: () => showRoomInfoSheet(context, ref, room),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                      decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(12)),
-                      child: Text.rich(
-                        TextSpan(children: [
-                          const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.campaign_rounded, size: 16, color: YoloColors.gold)),
-                          const TextSpan(text: ' Announcement: ', style: TextStyle(color: YoloColors.gold, fontWeight: FontWeight.w700)),
-                          TextSpan(text: st.announcement.isEmpty ? 'Welcome to ${st.name}!' : st.announcement),
-                        ]),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12, color: YoloColors.textSoft),
-                      ),
-                    ),
-                  ),
-                ),
                 // Chat
                 Expanded(
                   child: ShaderMask(
@@ -414,19 +409,36 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                     blendMode: BlendMode.dstIn,
                     child: ListView.builder(
                       controller: _scroll,
-                      padding: const EdgeInsets.fromLTRB(16, 10, 70, 8),
-                      itemCount: st.messages.length,
+                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+                      // System notes first, then the live announcement, then entries and chat in order.
+                      itemCount: st.messages.length + 1,
                       itemBuilder: (_, i) {
-                        final m = st.messages[i];
+                        final lead = st.messages.takeWhile((m) => m.kind == MessageKind.system).length;
+                        if (i == lead) {
+                          return _AnnouncementNote(
+                            key: const ValueKey('announcement'),
+                            text: st.announcement.isEmpty ? 'Welcome to ${st.name}!' : st.announcement,
+                            onTap: () => showRoomInfoSheet(context, ref, room),
+                          );
+                        }
+                        final index = i < lead ? i : i - 1;
+                        final m = st.messages[index];
                         final u = m.senderId == 0 ? null : roomUser(ref, m.senderId);
-                        return _MessageBubble(
+                        Widget bubble = _MessageBubble(
+                          key: ValueKey('m$index'),
                           msg: m,
                           user: u,
                           role: u == null ? 'Guest' : ctrl.roleOf(u.id),
                           member: u != null && st.members.contains(u.id),
                           roomName: st.name,
                           onUser: u == null ? null : () => _userCard(u),
-                        ).animate(key: ValueKey(i)).fadeIn(duration: 250.ms).slideX(begin: -0.06, end: 0);
+                        );
+                        // Chat lines keep clear of the floating gift / treasure buttons; notes use the full width.
+                        if (m.kind != MessageKind.system) bubble = Padding(padding: const EdgeInsets.only(right: 58), child: bubble);
+                        if (_animated.add(index) && index >= _firstLiveIndex) {
+                          bubble = bubble.animate().fadeIn(duration: 250.ms).slideX(begin: -0.04, end: 0);
+                        }
+                        return bubble;
                       },
                     ),
                   ),
@@ -498,7 +510,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
                       ).animate(onPlay: (c) => c.repeat(reverse: true)).rotate(begin: -0.03, end: 0.03, duration: 900.ms),
                     ),
                     const SizedBox(width: 6),
-                    GlassIconButton(size: 40, icon: Icons.work_outline_rounded, label: 'Room tools', onTap: _tools),
+                    _FourDotButton(onTap: _menuGrid),
                   ]),
                 ),
               ]),
@@ -510,15 +522,13 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
               child: AnimatedSwitcher(
                 duration: 400.ms,
                 transitionBuilder: (c, a) => SlideTransition(position: Tween(begin: const Offset(1, 0), end: Offset.zero).animate(a), child: c),
-                child: st.entryBanner != null
-                    ? _Pill(key: const ValueKey('entry'), icon: Icons.login_rounded, text: st.entryBanner!)
-                    : (st.track != null
-                        ? GestureDetector(
-                            key: ValueKey('music${st.track}'),
-                            onTap: () => showMusicSheet(context, ref, room),
-                            child: _Pill(icon: st.musicPlaying ? Icons.music_note_rounded : Icons.music_off_rounded, text: RoomState.tracks[st.track!], spin: st.musicPlaying),
-                          )
-                        : const SizedBox.shrink()),
+                child: st.track != null
+                    ? GestureDetector(
+                        key: ValueKey('music${st.track}'),
+                        onTap: () => showMusicSheet(context, ref, room),
+                        child: _Pill(icon: st.musicPlaying ? Icons.music_note_rounded : Icons.music_off_rounded, text: RoomState.tracks[st.track!], spin: st.musicPlaying),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ),
             // Red packet envelope + treasure box (bottom right)
@@ -577,13 +587,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
   }
 }
 
-/// Top three gift senders (gold, silver, bronze), highest first.
+/// Top three gift contributors in this room with their Charms (gift value they sent here).
 class _TopGifters extends StatelessWidget {
   const _TopGifters({required this.rows, required this.onTap});
   final List<(YoloUser, int)> rows;
   final VoidCallback onTap;
-
-  static const _ring = [Color(0xFFF5C451), Color(0xFFD1D5DB), Color(0xFFD97706)];
 
   @override
   Widget build(BuildContext context) {
@@ -591,40 +599,96 @@ class _TopGifters extends StatelessWidget {
     return Semantics(
       button: true,
       excludeSemantics: true,
-      label: 'Top gifters: ${rows.map((r) => r.$1.name).join(', ')}',
+      label: 'Top contributors: ${rows.map((r) => '${r.$1.name} ${r.$2}').join(', ')}',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          for (final (i, (u, _)) in rows.indexed)
+          for (final (u, charms) in rows)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 1.5),
-              child: Stack(clipBehavior: Clip.none, alignment: Alignment.bottomCenter, children: [
-                Container(
-                  padding: const EdgeInsets.all(1.5),
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: _ring[i]),
-                  child: YoloAvatar(user: u, size: 25),
-                ),
-                Positioned(
-                  bottom: -5,
-                  child: Container(
-                    width: 13,
-                    height: 13,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(color: _ring[i], shape: BoxShape.circle, border: Border.all(color: YoloColors.bg, width: 1)),
-                    child: Text('${i + 1}', style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1A1200))),
-                  ),
-                ),
+              key: ValueKey(u.id), // follows the person when the order changes
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                YoloAvatar(user: u, size: 26, plain: true),
+                const SizedBox(height: 2),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.favorite_rounded, size: 8, color: Color(0xFFF9A8D4)),
+                  const SizedBox(width: 1),
+                  Text(compactCount(charms), style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: Color(0xFFFBCFE8), height: 1)),
+                ]),
               ]),
-            ).animate(key: ValueKey('${u.id}-$i')).fadeIn(duration: 250.ms).scaleXY(begin: 0.7, end: 1),
+            ),
         ]),
       ),
     );
   }
 }
 
+/// Announcement, shown in the chat right under the system note (always the room's current text).
+class _AnnouncementNote extends StatelessWidget {
+  const _AnnouncementNote({super.key, required this.text, required this.onTap});
+  final String text;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.black26,
+            border: Border(left: BorderSide(color: YoloColors.gold.withValues(alpha: 0.8), width: 2.5)),
+          ),
+          child: Text.rich(
+            TextSpan(children: [
+              const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.campaign_rounded, size: 15, color: YoloColors.gold)),
+              const TextSpan(text: ' Announcement: ', style: TextStyle(color: YoloColors.gold, fontWeight: FontWeight.w700)),
+              TextSpan(text: text),
+            ]),
+            style: const TextStyle(fontSize: 12, color: YoloColors.textSoft, height: 1.4),
+          ),
+        ),
+      );
+}
+
+/// The four-colored, four-dot button that opens the room feature grid.
+class _FourDotButton extends StatelessWidget {
+  const _FourDotButton({required this.onTap});
+  final VoidCallback onTap;
+  static const _colors = [Color(0xFFF87171), Color(0xFFFBBF24), Color(0xFF60A5FA), Color(0xFF4ADE80)];
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        excludeSemantics: true,
+        label: 'More features',
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.08), shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              for (final row in [_colors.sublist(0, 2), _colors.sublist(2)])
+                Padding(
+                  padding: const EdgeInsets.all(1.5),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    for (final c in row)
+                      Container(width: 7.5, height: 7.5, margin: const EdgeInsets.symmetric(horizontal: 1.5), decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+                  ]),
+                ),
+            ]),
+          ),
+        ),
+      );
+}
+
 class _Pill extends StatelessWidget {
-  const _Pill({super.key, required this.icon, required this.text, this.spin = false});
+  const _Pill({required this.icon, required this.text, this.spin = false});
   final IconData icon;
   final String text;
   final bool spin;
@@ -743,7 +807,7 @@ class _SeatTile extends StatelessWidget {
 }
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.msg, required this.user, required this.role, required this.member, required this.roomName, this.onUser});
+  const _MessageBubble({super.key, required this.msg, required this.user, required this.role, required this.member, required this.roomName, this.onUser});
   final RoomMessage msg;
   final YoloUser? user;
   final String role;
@@ -754,8 +818,39 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (msg.kind) {
+      case MessageKind.entry:
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.fromLTRB(4, 4, 12, 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(colors: [const Color(0xFF7C3AED).withValues(alpha: 0.45), const Color(0xFF7C3AED).withValues(alpha: 0.08)]),
+            ),
+            child: GestureDetector(
+              onTap: onUser,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (user != null) YoloAvatar(user: user!, size: 20),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text.rich(
+                    TextSpan(children: [
+                      TextSpan(text: msg.sender, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFE9D5FF))),
+                      TextSpan(text: ' ${msg.text}'),
+                    ]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12, color: YoloColors.textSoft),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        );
       case MessageKind.system:
         return Container(
+          width: double.infinity,
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(12)),

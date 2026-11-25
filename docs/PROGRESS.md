@@ -280,3 +280,15 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Cleanup: removed duplicate Treasure tool, placeholder Games tool and duplicate bottom "More" button.
 - Fixed: mini room × used a tooltip with no overlay (would crash); bubble sizes itself to the real window.
 - Tests: minimize/restore 3× keeps seat, mic and claimed treasure; explicit exit removes the mini room.
+
+## Voice room polish 2 (chat notes, contributors, four-dot menu)
+- System note now spans the full width; announcement sits right under it, inside the scrolling chat
+  (always shows the room's current announcement, never duplicated).
+- "X entered the room" notices go into the chat under the announcement (no more top-right banner);
+  a repeat notice for the same person back-to-back is skipped.
+- Auto-scroll only when the reader is at the bottom (or sent the message); old messages don't re-animate.
+- Top 3 contributors: plain round pictures, no rings/rank numbers; each shows Charms (♥ gift value they
+  sent in this room, from the same contributions data used by the Contribution ranking).
+- Room picture: no border; tidier header spacing.
+- Bottom bar: briefcase icon replaced with the four-colored four-dot button → grid of Red packet, Music,
+  Settings (admins), Room info, Room level, Members, Invite, Ranking. Header ••• keeps Minimize, Report, Exit.

@@ -149,7 +149,6 @@ class RoomState {
   final GiftEvent? lastGift;
   final Map<int, SeatFx> seatFx; // userId -> effect
   final List<RedPacket> redPackets;
-  final String? entryBanner;
   final bool sentGift, sentMessage;
   final int watchSecs;
   final Set<int> claimedBoxes;
@@ -190,7 +189,6 @@ class RoomState {
     this.lastGift,
     this.seatFx = const {},
     this.redPackets = const [],
-    this.entryBanner,
     this.sentGift = false,
     this.sentMessage = false,
     this.watchSecs = 0,
@@ -232,8 +230,6 @@ class RoomState {
     GiftEvent? lastGift,
     Map<int, SeatFx>? seatFx,
     List<RedPacket>? redPackets,
-    String? entryBanner,
-    bool clearEntry = false,
     bool? sentGift,
     bool? sentMessage,
     int? watchSecs,
@@ -275,7 +271,6 @@ class RoomState {
         lastGift: lastGift ?? this.lastGift,
         seatFx: seatFx ?? this.seatFx,
         redPackets: redPackets ?? this.redPackets,
-        entryBanner: clearEntry ? null : (entryBanner ?? this.entryBanner),
         sentGift: sentGift ?? this.sentGift,
         sentMessage: sentMessage ?? this.sentMessage,
         watchSecs: watchSecs ?? this.watchSecs,
@@ -377,12 +372,10 @@ class RoomController extends Notifier<RoomState> {
     final speak = Timer.periodic(const Duration(milliseconds: 1400), (_) => _simulateSpeaking());
     final watch = Timer.periodic(const Duration(seconds: 1), (_) => _tickWatch());
     final presence = Timer.periodic(const Duration(seconds: 8), (_) => _simulatePresence());
-    final entry = Timer(const Duration(seconds: 3), () => state = state.copyWith(clearEntry: true));
     ref.onDispose(() {
       speak.cancel();
       watch.cancel();
       presence.cancel();
-      entry.cancel();
     });
     final others = [DemoUsers.zara, DemoUsers.kenji, DemoUsers.mia, null, DemoUsers.omar]
         .map((u) => u?.id == room.owner.id ? null : u)
@@ -404,7 +397,6 @@ class RoomController extends Notifier<RoomState> {
       exp: room.id == 884216 ? 475694 : (room.id % 97) * 4100,
       groupId: room.owner.id == me.id ? 1 : null,
       contributions: {DemoUsers.zara.id: 5200, DemoUsers.omar.id: 1999, DemoUsers.kenji.id: 520},
-      entryBanner: '${me.name} entered the room',
       onlineIds: {room.owner.id, me.id, for (final u in others) if (u != null) u.id},
       listeners: max(0, room.online - 5),
       messages: [
@@ -413,6 +405,8 @@ class RoomController extends Notifier<RoomState> {
             text: 'Welcome to Yolo! Please be kind. Sexual content, hate, scams and illegal content are not allowed. '
                 'Moderators review rooms 24/7 — report anything that breaks the Safety guidelines.'),
         if (room.isFamily) const RoomMessage(kind: MessageKind.system, text: 'This is your family voice room.'),
+        // Entry notices sit right under the announcement, inside the scrolling chat.
+        RoomMessage(kind: MessageKind.entry, sender: me.name, senderId: me.id, text: 'entered the room'),
         RoomMessage(kind: MessageKind.chat, sender: 'Kenji', senderId: DemoUsers.kenji.id, text: 'Good evening everyone!', color: const Color(0xFF7DD3FC)),
         RoomMessage(kind: MessageKind.chat, sender: 'Mia', senderId: DemoUsers.mia.id, text: 'Who wants to play Ludo after this?', color: const Color(0xFF86EFAC)),
       ],
@@ -458,20 +452,24 @@ class RoomController extends Notifier<RoomState> {
   /// Demo presence: listeners come and go; Leo drops in and out. With Laravel these are presence-channel events.
   void _simulatePresence() {
     final ids = {...state.onlineIds};
-    String? banner;
+    YoloUser? entered;
     if (!ids.contains(DemoUsers.leo.id) && _rand.nextInt(3) == 0 && !state.banned.contains(DemoUsers.leo.id)) {
       ids.add(DemoUsers.leo.id);
-      banner = 'Leo entered the room';
+      entered = DemoUsers.leo;
     } else if (ids.contains(DemoUsers.leo.id) && _rand.nextInt(4) == 0 && !state.seats.any((s) => s.user?.id == DemoUsers.leo.id)) {
       ids.remove(DemoUsers.leo.id);
     }
     final delta = _rand.nextInt(3) - 1; // -1, 0, +1
-    state = state.copyWith(onlineIds: ids, listeners: max(0, state.listeners + delta), entryBanner: banner);
-    if (banner != null) {
-      Timer(const Duration(seconds: 3), () {
-        if (ref.mounted && state.entryBanner == banner) state = state.copyWith(clearEntry: true);
-      });
-    }
+    state = state.copyWith(onlineIds: ids, listeners: max(0, state.listeners + delta));
+    if (entered != null) userEntered(entered);
+  }
+
+  /// Adds an "X entered the room" notice to the chat. Skips a repeat of the same person's
+  /// notice when nothing else has been said since (no duplicates on quick re-joins).
+  void userEntered(YoloUser u) {
+    final last = state.messages.lastOrNull;
+    if (last != null && last.kind == MessageKind.entry && last.senderId == u.id) return;
+    state = state.copyWith(messages: [...state.messages, RoomMessage(kind: MessageKind.entry, sender: u.name, senderId: u.id, text: 'entered the room')]);
   }
 
   /// Top gift senders in this room (highest first), with real profiles.
