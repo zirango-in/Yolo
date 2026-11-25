@@ -26,3 +26,13 @@ Read this first when starting a new session: it says exactly where we stopped.
 2. Phone OTP + Google login screens (UI), wired to `ApiRepository`.
 3. Agora voice in rooms (needs an Agora App ID).
 4. Room settings, admin controls (lock/mute/kick), room member list.
+
+## Session 1, continued — Step 1 done
+- Full roadmap from the owner's 17-section list: `docs/ROADMAP.md` (games moved to the end, by owner's choice).
+- Step 1 pages built on demo data, all reachable from Home quick entries / bottom nav:
+  Discover (search users/rooms/ID, follow, topics), Game Center (coming soon), Friends (friends/following/followers),
+  Messages inbox + 1-to-1 chat, Moments (trending/following, like), Family (join/leave, my family, members),
+  Events (current/upcoming, details & rules), Shop (buy with coins, equip), Notifications (categories, read all),
+  Settings home, other user profile (follow, message, report/block).
+- Tests: `test/app_flow_test.dart`, `test/main_pages_test.dart` — passing.
+- Next: Step 2 (login & account pages).

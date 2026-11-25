@@ -7,6 +7,8 @@ import '../../core/theme.dart';
 import '../../data/models.dart';
 import '../../data/providers.dart';
 import '../../widgets/common.dart';
+import '../games/game_center_screen.dart';
+import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
 
 /// Main shell with the premium bottom navigation.
@@ -31,9 +33,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     final pages = const [
       _RoomsTab(),
-      _ComingSoon(title: 'Games', subtitle: 'Draw & Guess, Ludo, Who is the Spy and more arrive in Phase 3.', icon: Icons.sports_esports_rounded),
+      GameCenterScreen(embedded: true),
       SizedBox.shrink(),
-      _ComingSoon(title: 'Messages', subtitle: 'Private chats and notifications arrive in Phase 2.', icon: Icons.chat_bubble_rounded),
+      MessagesScreen(),
       ProfileScreen(),
     ];
     return Scaffold(
@@ -164,9 +166,9 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
                     ),
                     Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: CoinPill(coins: me?.coins ?? 0))),
                     const SizedBox(width: 10),
-                    GlassIconButton(icon: Icons.search_rounded, label: 'Search', onTap: () {}),
+                    GlassIconButton(icon: Icons.search_rounded, label: 'Search', onTap: () => context.push('/discover')),
                     const SizedBox(width: 10),
-                    GlassIconButton(icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () {}),
+                    GlassIconButton(icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () => context.push('/notifications')),
                   ]),
                 ),
               ),
@@ -203,6 +205,7 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
                   ]),
                 ),
               ),
+              const SliverToBoxAdapter(child: _QuickEntries()),
               const SliverToBoxAdapter(child: _EventBanner()),
               const SliverToBoxAdapter(
                 child: Padding(
@@ -240,6 +243,50 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
       ),
     ]);
   }
+}
+
+/// Shortcut grid to the main sections.
+class _QuickEntries extends StatelessWidget {
+  const _QuickEntries();
+
+  static const _items = [
+    (Icons.explore_rounded, 'Discover', Color(0xFF7DD3FC), '/discover'),
+    (Icons.celebration_rounded, 'Events', Color(0xFFFDA4AF), '/events'),
+    (Icons.storefront_rounded, 'Shop', Color(0xFFF5C451), '/shop'),
+    (Icons.groups_rounded, 'Family', Color(0xFFC4B5FD), '/family'),
+    (Icons.photo_library_rounded, 'Moments', Color(0xFF86EFAC), '/moments'),
+    (Icons.people_alt_rounded, 'Friends', Color(0xFF93C5FD), '/friends'),
+    (Icons.sports_esports_rounded, 'Games', Color(0xFFFDBA74), '/games'),
+    (Icons.settings_rounded, 'Settings', Color(0xFFD9D0F2), '/settings'),
+  ];
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
+        child: GridView.count(
+          crossAxisCount: 4,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 1.05,
+          children: [
+            for (final (i, (icon, label, color, route)) in _items.indexed)
+              InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => context.push(route),
+                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(color: color.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(15)),
+                    child: Icon(icon, color: color, size: 24),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                ]),
+              ).animate().fadeIn(delay: (30 * i).ms).scaleXY(begin: 0.85, end: 1, curve: Curves.easeOutBack),
+          ],
+        ),
+      );
 }
 
 class _EventBanner extends StatelessWidget {
@@ -333,25 +380,4 @@ class _RoomCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ComingSoon extends StatelessWidget {
-  const _ComingSoon({required this.title, required this.subtitle, required this.icon});
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 64, color: YoloColors.gold).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(begin: -4, end: 4, duration: 1200.ms),
-            const SizedBox(height: 16),
-            Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 8),
-            Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(color: YoloColors.textMuted)),
-          ]),
-        ),
-      );
 }

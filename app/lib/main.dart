@@ -8,7 +8,18 @@ import 'data/models.dart';
 import 'data/providers.dart';
 import 'features/auth/login_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/discover/discover_screen.dart';
+import 'features/events/events_screen.dart';
+import 'features/family/family_screen.dart';
+import 'features/friends/friends_screen.dart';
+import 'features/games/game_center_screen.dart';
+import 'features/messages/messages_screen.dart';
+import 'features/moments/moments_screen.dart';
+import 'features/notifications/notifications_screen.dart';
+import 'features/profile/user_profile_screen.dart';
 import 'features/room/room_screen.dart';
+import 'features/settings/settings_screen.dart';
+import 'features/shop/shop_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +43,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
       GoRoute(path: '/room', builder: (_, state) => RoomScreen(room: state.extra! as Room)),
+      GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen()),
+      GoRoute(path: '/games', builder: (_, _) => const GameCenterScreen()),
+      GoRoute(path: '/friends', builder: (_, _) => const FriendsScreen()),
+      GoRoute(path: '/chat', builder: (_, state) => ChatScreen(user: state.extra! as YoloUser)),
+      GoRoute(path: '/user', builder: (_, state) => UserProfileScreen(user: state.extra! as YoloUser)),
+      GoRoute(path: '/moments', builder: (_, _) => const MomentsScreen()),
+      GoRoute(path: '/family', builder: (_, _) => const FamilyScreen()),
+      GoRoute(path: '/events', builder: (_, _) => const EventsScreen()),
+      GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
+      GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
+      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
     ],
   );
 });

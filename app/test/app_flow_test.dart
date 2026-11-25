@@ -44,6 +44,8 @@ void main() {
     expect(find.text('Late Night Talks'), findsOneWidget);
 
     // Open room
+    await tester.scrollUntilVisible(find.text('Late Night Talks'), 200, scrollable: find.byType(Scrollable).first);
+    await settle(tester);
     await tester.tap(find.text('Late Night Talks'));
     await settle(tester);
     await settle(tester);

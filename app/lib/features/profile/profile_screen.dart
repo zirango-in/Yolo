@@ -24,11 +24,13 @@ class ProfileScreen extends ConsumerWidget {
         );
 
     final menu = [
-      (Icons.account_balance_wallet_rounded, 'Wallet', formatCoins(me.coins), const Color(0xFFF5C451)),
-      (Icons.storefront_rounded, 'Store', '', const Color(0xFFF9A8D4)),
-      (Icons.backpack_rounded, 'Backpack', '', const Color(0xFF7DD3FC)),
-      (Icons.groups_rounded, 'My Family', '', const Color(0xFFC4B5FD)),
-      (Icons.settings_rounded, 'Settings', '', YoloColors.textSoft),
+      (Icons.account_balance_wallet_rounded, 'Wallet', formatCoins(me.coins), const Color(0xFFF5C451), '/shop'),
+      (Icons.storefront_rounded, 'Shop', '', const Color(0xFFF9A8D4), '/shop'),
+      (Icons.people_alt_rounded, 'Friends', '', const Color(0xFF7DD3FC), '/friends'),
+      (Icons.groups_rounded, 'My Family', '', const Color(0xFFC4B5FD), '/family'),
+      (Icons.photo_library_rounded, 'Moments', '', const Color(0xFF86EFAC), '/moments'),
+      (Icons.celebration_rounded, 'Events', '', const Color(0xFFFDA4AF), '/events'),
+      (Icons.settings_rounded, 'Settings', '', YoloColors.textSoft, '/settings'),
     ];
 
     return ListView(
@@ -100,7 +102,7 @@ class ProfileScreen extends ConsumerWidget {
           decoration: BoxDecoration(color: YoloColors.surface, borderRadius: BorderRadius.circular(18)),
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
-            for (final (icon, label, value, color) in menu)
+            for (final (icon, label, value, color, route) in menu)
               ListTile(
                 leading: Container(
                   width: 34,
@@ -113,7 +115,7 @@ class ProfileScreen extends ConsumerWidget {
                   if (value.isNotEmpty) Text(value, style: const TextStyle(color: YoloColors.gold, fontWeight: FontWeight.w700)),
                   const Icon(Icons.chevron_right_rounded, color: YoloColors.textMuted),
                 ]),
-                onTap: () {},
+                onTap: () => context.push(route),
               ),
           ]),
         ),
