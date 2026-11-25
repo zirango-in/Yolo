@@ -287,6 +287,7 @@ class RoomSettingsScreen extends ConsumerWidget {
           }),
         ]),
         card([
+          toggle('Partner seat', st.mode == 'intimacy', (v) => ctrl.updateSettings(mode: v ? 'intimacy' : 'normal'), subtitle: 'Seat next to the host, works in any room mode'),
           toggle('High quality mode', st.highQuality, (v) => ctrl.updateSettings(highQuality: v), subtitle: 'Better voice, uses more data'),
           toggle('Ban text chatting', st.banText, (v) => ctrl.updateSettings(banText: v), subtitle: 'Only admins can chat'),
           toggle('No images', st.noImages, (v) => ctrl.updateSettings(noImages: v)),

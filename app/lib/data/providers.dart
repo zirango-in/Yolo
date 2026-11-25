@@ -811,7 +811,7 @@ class RoomController extends Notifier<RoomState> {
       fee: fee,
       groupId: groupId,
     );
-    if (mode != null && mode != wasMode) _system(mode == 'intimacy' ? 'Owner enabled the Intimacy Seat' : 'Owner switched to normal seats');
+    if (mode != null && mode != wasMode) _system(mode == 'intimacy' ? 'Partner seat turned on' : 'Partner seat turned off');
     _record('updated room settings');
     _save();
   }
@@ -826,7 +826,7 @@ class RoomController extends Notifier<RoomState> {
     if (m == state.roomMode) return '';
     state = state.copyWith(
       roomMode: m,
-      mode: m == 'acquaint' ? 'intimacy' : 'normal', // acquaint = host + partner seats
+      mode: m == 'acquaint' ? 'intimacy' : null, // acquaint turns the partner seat on; otherwise the Partner seat setting decides
       clearAuction: m != 'auction',
       clearVideo: m != 'video',
       clearGame: m != 'game',

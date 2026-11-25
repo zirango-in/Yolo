@@ -250,22 +250,16 @@ class _Header extends ConsumerWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                       Row(mainAxisSize: MainAxisSize.min, children: [
                         if (locked) Padding(padding: const EdgeInsets.only(right: 3), child: Icon(Icons.lock_rounded, size: 12, color: look.accent)),
-                        Flexible(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, height: 1.2))),
-                      ]),
-                      const SizedBox(height: 3),
-                      Row(mainAxisSize: MainAxisSize.min, children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(2, 1, 6, 1),
-                          decoration: BoxDecoration(color: levelColor.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(8)),
-                          child: Row(mainAxisSize: MainAxisSize.min, children: [
-                            RoomLevelBadge(lvl, size: 13),
-                            const SizedBox(width: 3),
-                            Text('Level $lvl', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: levelColor)),
-                          ]),
-                        ),
+                        Flexible(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, height: 1.15))),
                       ]),
                       const SizedBox(height: 2),
-                      Text('Room ID: ${room.id}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 9.5, color: Color(0xFFC4B8E6))),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(color: levelColor.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(6)),
+                        child: Text('Level $lvl', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: levelColor, height: 1.2)),
+                      ),
+                      const SizedBox(height: 2),
+                      Text('Room ID: ${room.id}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 8.5, color: Color(0xFFC4B8E6), height: 1.2)),
                     ]),
                   ),
                 ]),
@@ -358,7 +352,6 @@ class _TopContributors extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (rows.isEmpty) return const SizedBox.shrink();
-    final look = RoomLookScope.of(context);
     return Semantics(
       button: true,
       excludeSemantics: true,
@@ -372,22 +365,22 @@ class _TopContributors extends StatelessWidget {
               key: ValueKey(u.id),
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: SizedBox(
-                width: 34,
-                height: 38,
+                width: 30,
+                height: 34,
                 child: Stack(alignment: Alignment.topCenter, clipBehavior: Clip.none, children: [
-                  YoloAvatar(user: u, size: 30, plain: true),
+                  YoloAvatar(user: u, size: 26, plain: true),
+                  // Transparent tag: just the number, with a soft shadow so it reads on every theme.
                   Positioned(
                     bottom: 0,
-                    child: Container(
-                      constraints: const BoxConstraints(minWidth: 26),
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: look.bg.last,
-                        borderRadius: BorderRadius.circular(7),
-                        border: Border.all(color: look.accent.withValues(alpha: 0.7), width: 0.8),
+                    child: Text(
+                      compactCount(charms),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                        shadows: [Shadow(color: Colors.black87, blurRadius: 3)],
                       ),
-                      child: Text(compactCount(charms),
-                          textAlign: TextAlign.center, style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, height: 1.1)),
                     ),
                   ),
                 ]),
