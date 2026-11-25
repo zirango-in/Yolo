@@ -198,7 +198,7 @@ class WalletScreen extends ConsumerWidget {
             link(Icons.shopping_bag_rounded, 'Purchase history', const Color(0xFFC4B5FD), () => context.push('/wallet/purchases')),
             link(Icons.redeem_rounded, 'Redeem gift card', const Color(0xFFFDBA74), () => _giftCard(context, ref)),
             link(Icons.storefront_rounded, 'Shop', const Color(0xFFF5C451), () => context.push('/shop')),
-            link(Icons.workspace_premium_rounded, 'VIP membership', const Color(0xFFFDE68A), () => showYoloToast(context, 'VIP Center arrives in Step 10')),
+            link(Icons.workspace_premium_rounded, 'VIP membership', const Color(0xFFFDE68A), () => context.push('/vip')),
             link(Icons.groups_rounded, 'Family coins', const Color(0xFFA78BFA), () => context.push('/family'),
                 value: fam.familyId != null ? '${fam.familyCoins} FC' : ''),
           ]),

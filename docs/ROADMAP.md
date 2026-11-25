@@ -91,8 +91,8 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Shop · Gift Cards · Virtual Items · Monthly Packs · VIP Purchase
 
 ## Step 10 — VIP Membership
-- [ ] VIP Center · Benefits · Levels · VIP Gifts · VIP Rings · Privileges
-- [ ] Monthly Subscription · Subscription Management · VIP Purchase History
+- [x] VIP Center · Benefits · Levels · VIP Gifts · VIP Rings · Privileges
+- [x] Monthly Subscription · Subscription Management · VIP Purchase History
 
 ## Step 11 — Rankings & Leaderboards
 - [ ] Global · User · Game · Voice Room · Gift · Family

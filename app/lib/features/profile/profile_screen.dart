@@ -153,7 +153,7 @@ class ProfileScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           gradient: const LinearGradient(colors: [Color(0xFF2A1A05), Color(0xFF4A3410)]),
           border: YoloColors.gold.withValues(alpha: 0.45),
-          onTap: () => showYoloToast(context, 'VIP Center arrives in Step 10'),
+          onTap: () => context.push('/vip'),
           child: const Row(children: [
             Icon(Icons.workspace_premium_rounded, color: YoloColors.gold, size: 34),
             SizedBox(width: 12),

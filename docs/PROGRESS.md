@@ -140,6 +140,14 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Real payments need Google Play Billing (`in_app_purchase`) + Laravel receipt verification.
 - Tests: `test/wallet_test.dart`; all 11 tests passing.
 
-## NEXT: Step 10 — VIP membership
-VIP center, benefits, levels, VIP gifts, VIP rings, privileges, monthly subscription,
-subscription management, VIP purchase history.
+## Step 10 done — VIP membership
+- 7 VIP levels (Knight → King) with monthly coin price and daily free coins; data in `lib/data/vip_providers.dart`.
+- VIP Center (Me → VIP Center, or Wallet → VIP): my status (level, days left, auto-renew), claim daily VIP coins,
+  tier strip, per-tier card with 12 privileges (locked/unlocked), VIP gifts, VIP ring (VIP 4+, equip),
+  buy / renew / upgrade (upgrade credits unused days of the current tier; lower tiers blocked).
+- Subscription page: plan, expiry, auto-renew switch, cancel (stays active until expiry).
+- VIP purchase history.
+- Tests: `test/vip_test.dart`; all 12 tests passing.
+
+## NEXT: Step 11 — Rankings & leaderboards
+Global, user, game, voice room, gift, family rankings; popular users / rooms; weekly; event ranking.

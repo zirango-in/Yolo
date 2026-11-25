@@ -35,6 +35,11 @@ class SessionController extends Notifier<YoloUser?> {
     if (me != null) state = me.copyWith(name: name, gender: gender, age: age);
   }
 
+  void setVip(int level) {
+    final me = state;
+    if (me != null) state = me.copyWith(vipLevel: level);
+  }
+
   void changeId(int id) {
     final me = state;
     if (me != null) state = me.copyWith(id: id);

@@ -34,6 +34,7 @@ import 'features/room/create_room_screen.dart';
 import 'features/room/room_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/shop/shop_screen.dart';
+import 'features/vip/vip_pages.dart';
 import 'features/wallet/wallet_pages.dart';
 
 void main() {
@@ -107,6 +108,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/gifts/ranking', builder: (_, _) => const GiftRankingScreen()),
       GoRoute(path: '/backpack', builder: (_, _) => const BackpackScreen()),
       GoRoute(path: '/wallet', builder: (_, _) => const WalletScreen()),
+      GoRoute(path: '/vip', builder: (_, _) => const VipCenterScreen()),
+      GoRoute(path: '/vip/manage', builder: (_, _) => const VipManageScreen()),
+      GoRoute(path: '/vip/history', builder: (_, _) => const VipHistoryScreen()),
       GoRoute(path: '/wallet/transactions', builder: (_, _) => const TransactionsScreen()),
       GoRoute(path: '/wallet/purchases', builder: (_, _) => const PurchaseHistoryScreen()),
       GoRoute(path: '/rewards', builder: (_, _) => const RewardsScreen()),
