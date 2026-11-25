@@ -80,9 +80,9 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Rankings · Upgrade · Leave Family
 
 ## Step 8 — Gifts & Virtual Items
-- [ ] Gift Store · Send · Receive · Categories · Animations · Special Gifts
-- [ ] Gift History · My Gifts · Gift Rankings
-- [ ] Avatar Items · Avatar Frames · Decorations · Special Effects
+- [x] Gift Store · Send · Receive · Categories · Animations · Special Gifts
+- [x] Gift History · My Gifts · Gift Rankings
+- [x] Avatar Items · Avatar Frames · Decorations · Special Effects
 
 ## Step 9 — Coins, Wallet & Shop
 - [ ] Coins · Recharge [api: Google Play billing] · Purchase History · Transactions

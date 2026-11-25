@@ -42,6 +42,9 @@ class ProfileScreen extends ConsumerWidget {
     final menu = [
       (Icons.account_balance_wallet_rounded, 'Wallet', formatCoins(me.coins), const Color(0xFFF5C451), '/shop'),
       (Icons.storefront_rounded, 'Shop', '', const Color(0xFFF9A8D4), '/shop'),
+      (Icons.card_giftcard_rounded, 'Gift store', '', const Color(0xFFFDBA74), '/gifts'),
+      (Icons.backpack_rounded, 'My items', '', const Color(0xFF86EFAC), '/backpack'),
+      (Icons.history_rounded, 'Gift history', '', const Color(0xFF7DD3FC), '/gifts/history'),
       (Icons.groups_rounded, 'My Family', '', const Color(0xFFC4B5FD), '/family'),
       (Icons.celebration_rounded, 'Events', '', const Color(0xFFFDA4AF), '/events'),
       (Icons.manage_accounts_rounded, 'Account', '', const Color(0xFF7DD3FC), '/account'),

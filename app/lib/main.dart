@@ -20,6 +20,7 @@ import 'features/family/family_pages.dart';
 import 'features/family/family_screen.dart';
 import 'features/friends/friends_screen.dart';
 import 'features/games/game_center_screen.dart';
+import 'features/gifts/gift_pages.dart';
 import 'features/messages/messages_screen.dart';
 import 'features/moments/create_post_screen.dart';
 import 'features/moments/moments_screen.dart';
@@ -100,6 +101,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/family/ranking', builder: (_, _) => const FamilyRankingScreen()),
       GoRoute(path: '/events', builder: (_, _) => const EventsScreen()),
       GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
+      GoRoute(path: '/gifts', builder: (_, _) => const GiftStoreScreen()),
+      GoRoute(path: '/gifts/history', builder: (_, _) => const GiftHistoryScreen()),
+      GoRoute(path: '/gifts/ranking', builder: (_, _) => const GiftRankingScreen()),
+      GoRoute(path: '/backpack', builder: (_, _) => const BackpackScreen()),
       GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
     ],

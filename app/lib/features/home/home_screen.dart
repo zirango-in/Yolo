@@ -252,7 +252,7 @@ class _QuickEntries extends StatelessWidget {
     (Icons.groups_rounded, 'Family', Color(0xFFC4B5FD), '/family'),
     (Icons.photo_library_rounded, 'Moments', Color(0xFF86EFAC), '/moments'),
     (Icons.people_alt_rounded, 'Friends', Color(0xFF93C5FD), '/friends'),
-    (Icons.sports_esports_rounded, 'Games', Color(0xFFFDBA74), '/games'),
+    (Icons.card_giftcard_rounded, 'Gifts', Color(0xFFFDBA74), '/gifts'),
     (Icons.settings_rounded, 'Settings', Color(0xFFD9D0F2), '/settings'),
   ];
 

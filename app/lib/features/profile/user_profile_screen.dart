@@ -9,6 +9,7 @@ import '../../data/profile_providers.dart';
 import '../../data/social_providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/page_kit.dart';
+import '../gifts/gift_pages.dart';
 import '../room/room_sheets.dart';
 
 /// Another user's profile: cover, stats, follow/friend status, badges, gift wall, moments.
@@ -108,7 +109,14 @@ class UserProfileScreen extends ConsumerWidget {
                     )
                   : GoldButton(label: theyFollow ? 'Follow back' : 'Follow', height: 50, onPressed: () => ref.read(followingProvider.notifier).toggle(user.id)),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
+            IconButton.filledTonal(
+              tooltip: 'Send gift',
+              onPressed: () => showSendGiftSheet(context, ref, user),
+              style: IconButton.styleFrom(minimumSize: const Size(50, 50), foregroundColor: YoloColors.gold),
+              icon: const Icon(Icons.card_giftcard_rounded),
+            ),
+            const SizedBox(width: 10),
             Expanded(
               child: OutlinedButton.icon(
                 onPressed: () => context.push('/chat', extra: user),

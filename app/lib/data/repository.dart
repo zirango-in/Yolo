@@ -38,6 +38,26 @@ class DemoUsers {
   static const leo = YoloUser(id: 2005, name: 'Leo', gender: 'male', avatarColors: [Color(0xFFEF4444), Color(0xFFF59E0B)]);
 }
 
+const demoGiftCatalog = [
+  Gift(id: 1, name: 'Rose', price: 1, icon: Icons.local_florist, tint: Color(0xFFFDA4AF)),
+  Gift(id: 2, name: 'Heart', price: 10, icon: Icons.favorite, tint: Color(0xFFF9A8D4)),
+  Gift(id: 9, name: 'Lollipop', price: 5, icon: Icons.cake, tint: Color(0xFFFBCFE8)),
+  Gift(id: 10, name: 'Coffee', price: 20, icon: Icons.local_cafe, tint: Color(0xFFD6A77A)),
+  Gift(id: 3, name: 'Crown', price: 520, icon: Icons.workspace_premium, tint: Color(0xFFFDE7A8), fullScreen: true),
+  Gift(id: 4, name: 'Diamond', price: 999, icon: Icons.diamond, tint: Color(0xFF7DD3FC), fullScreen: true),
+  Gift(id: 5, name: 'Rocket', price: 1999, icon: Icons.rocket_launch, tint: Color(0xFFD8B4FE), fullScreen: true),
+  Gift(id: 6, name: 'Sports Car', price: 5200, icon: Icons.directions_car, tint: Color(0xFFFCA5A5), fullScreen: true),
+  Gift(id: 11, name: 'Lucky Clover', price: 10, icon: Icons.eco, tint: Color(0xFF86EFAC), category: 'lucky'),
+  Gift(id: 12, name: 'Lucky Star', price: 50, icon: Icons.star, tint: Color(0xFFFDE68A), category: 'lucky'),
+  Gift(id: 13, name: 'Lucky Box', price: 100, icon: Icons.card_giftcard, tint: Color(0xFFFDBA74), category: 'lucky'),
+  Gift(id: 14, name: 'VIP Rose', price: 99, icon: Icons.local_florist, tint: Color(0xFFF5C451), category: 'vip', vipLevel: 1),
+  Gift(id: 15, name: 'VIP Throne', price: 8888, icon: Icons.chair, tint: Color(0xFFF5C451), category: 'vip', vipLevel: 5, fullScreen: true),
+  Gift(id: 16, name: 'VIP Dragon', price: 18888, icon: Icons.local_fire_department, tint: Color(0xFFFB923C), category: 'vip', vipLevel: 7, fullScreen: true),
+  Gift(id: 7, name: 'Ring', price: 9999, icon: Icons.radio_button_checked, tint: Color(0xFFFDE68A), fullScreen: true, category: 'special'),
+  Gift(id: 8, name: 'Castle', price: 29999, icon: Icons.castle, tint: Color(0xFFC7D2FE), fullScreen: true, category: 'special'),
+  Gift(id: 17, name: 'Galaxy', price: 52000, icon: Icons.auto_awesome, tint: Color(0xFFA5B4FC), fullScreen: true, category: 'special'),
+];
+
 class DemoRepository implements YoloRepository {
   @override
   Future<YoloUser> login({required String method, String? phone, String? otp}) async {
@@ -67,16 +87,7 @@ class DemoRepository implements YoloRepository {
   }
 
   @override
-  Future<List<Gift>> gifts() async => const [
-        Gift(id: 1, name: 'Rose', price: 1, icon: Icons.local_florist, tint: Color(0xFFFDA4AF)),
-        Gift(id: 2, name: 'Heart', price: 10, icon: Icons.favorite, tint: Color(0xFFF9A8D4)),
-        Gift(id: 3, name: 'Crown', price: 520, icon: Icons.workspace_premium, tint: Color(0xFFFDE7A8), fullScreen: true),
-        Gift(id: 4, name: 'Diamond', price: 999, icon: Icons.diamond, tint: Color(0xFF7DD3FC), fullScreen: true),
-        Gift(id: 5, name: 'Rocket', price: 1999, icon: Icons.rocket_launch, tint: Color(0xFFD8B4FE), fullScreen: true),
-        Gift(id: 6, name: 'Sports Car', price: 5200, icon: Icons.directions_car, tint: Color(0xFFFCA5A5), fullScreen: true),
-        Gift(id: 7, name: 'Ring', price: 9999, icon: Icons.radio_button_checked, tint: Color(0xFFFDE68A), fullScreen: true),
-        Gift(id: 8, name: 'Castle', price: 29999, icon: Icons.castle, tint: Color(0xFFC7D2FE), fullScreen: true),
-      ];
+  Future<List<Gift>> gifts() async => demoGiftCatalog;
 }
 
 // ---------------------------------------------------------------------------

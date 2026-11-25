@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
 import '../../data/models.dart';
+import '../../data/gift_providers.dart';
 import '../../data/providers.dart';
 import '../../widgets/common.dart';
 
@@ -32,13 +33,13 @@ class _GiftSheetState extends ConsumerState<GiftSheet> {
 
   void _send(List<Gift> gifts) {
     final gift = gifts.firstWhere((g) => g.id == _giftId, orElse: () => gifts.first);
-    final ok = ref.read(roomProvider(widget.room).notifier).sendGift(gift, _target!, _qty);
-    if (ok) {
-      Navigator.of(context).pop();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Not enough coins. Recharge to send this gift.'),
+    final res = ref.read(roomProvider(widget.room).notifier).sendGift(gift, _target!, _qty, fromBackpack: _tab == 3);
+    if (res.ok) Navigator.of(context).pop();
+    if (!res.ok || res.luckyWin > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(res.message),
         behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 90),
       ));
     }
   }
@@ -48,6 +49,7 @@ class _GiftSheetState extends ConsumerState<GiftSheet> {
     final me = ref.watch(sessionProvider);
     final roomState = ref.watch(roomProvider(widget.room));
     final gifts = ref.watch(giftsProvider);
+    final backpack = ref.watch(giftCenterProvider).backpack;
     final targets = <YoloUser>[
       widget.room.owner,
       for (final s in roomState.seats)
@@ -97,7 +99,10 @@ class _GiftSheetState extends ConsumerState<GiftSheet> {
             Padding(
               padding: const EdgeInsets.only(right: 20),
               child: GestureDetector(
-                onTap: () => setState(() => _tab = i),
+                onTap: () => setState(() {
+                  _tab = i;
+                  _giftId = null;
+                }),
                 child: Column(children: [
                   Text(_tabs[i],
                       style: TextStyle(
@@ -116,14 +121,16 @@ class _GiftSheetState extends ConsumerState<GiftSheet> {
           loading: () => const SizedBox(height: 220, child: Center(child: CircularProgressIndicator(color: YoloColors.gold))),
           error: (e, _) => SizedBox(height: 220, child: Center(child: Text('$e'))),
           data: (list) {
-            final shown = _tab == 0 ? list : const <Gift>[];
+            final shown = switch (_tab) {
+              1 => list.where((g) => g.category == 'lucky').toList(),
+              2 => list.where((g) => g.category == 'vip').toList(),
+              3 => list.where((g) => (backpack[g.id] ?? 0) > 0).toList(),
+              _ => list.where((g) => g.category == 'popular' || g.category == 'special').toList(),
+            };
             if (shown.isEmpty) {
-              return SizedBox(
+              return const SizedBox(
                 height: 220,
-                child: Center(
-                  child: Text('${_tabs[_tab]} gifts arrive in a later phase',
-                      style: const TextStyle(color: YoloColors.textMuted)),
-                ),
+                child: Center(child: Text('Your backpack is empty', style: TextStyle(color: YoloColors.textMuted))),
               );
             }
             final selected = _giftId ?? shown.first.id;
@@ -137,7 +144,7 @@ class _GiftSheetState extends ConsumerState<GiftSheet> {
                 childAspectRatio: 0.82,
                 children: [
                   for (final g in shown)
-                    _GiftTile(gift: g, selected: g.id == selected, onTap: () => setState(() => _giftId = g.id)),
+                    _GiftTile(gift: g, selected: g.id == selected, count: _tab == 3 ? backpack[g.id] : null, onTap: () => setState(() => _giftId = g.id)),
                 ],
               ),
               const SizedBox(height: 14),
@@ -192,10 +199,11 @@ class _GiftSheetState extends ConsumerState<GiftSheet> {
 }
 
 class _GiftTile extends StatelessWidget {
-  const _GiftTile({required this.gift, required this.selected, required this.onTap});
+  const _GiftTile({required this.gift, required this.selected, required this.onTap, this.count});
   final Gift gift;
   final bool selected;
   final VoidCallback onTap;
+  final int? count; // backpack count
 
   @override
   Widget build(BuildContext context) {
@@ -221,6 +229,11 @@ class _GiftTile extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(gift.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            if (count != null)
+              Text('×$count', style: const TextStyle(fontSize: 11, color: Color(0xFF86EFAC), fontWeight: FontWeight.w700))
+            else if (gift.vipLevel > 0)
+              Text('VIP ${gift.vipLevel}', style: const TextStyle(fontSize: 11, color: YoloColors.gold, fontWeight: FontWeight.w800))
+            else
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const CoinIcon(size: 10),
               const SizedBox(width: 3),

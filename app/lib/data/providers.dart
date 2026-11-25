@@ -4,6 +4,7 @@ import 'dart:ui' show Color;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'gift_providers.dart';
 import 'models.dart';
 import 'repository.dart';
 
@@ -288,9 +289,10 @@ class RoomController extends Notifier<RoomState> {
     ]);
   }
 
-  /// Returns false when coins are not enough.
-  bool sendGift(Gift gift, YoloUser to, int qty) {
-    if (!ref.read(sessionProvider.notifier).spend(gift.price * qty)) return false;
+  /// Sends a gift in the room (coins or backpack) and plays the animation.
+  SendResult sendGift(Gift gift, YoloUser to, int qty, {bool fromBackpack = false}) {
+    final res = ref.read(giftCenterProvider.notifier).send(gift, to, qty, fromBackpack: fromBackpack);
+    if (!res.ok) return res;
     _giftSerial++;
     final total = gift.price * qty;
     state = state.copyWith(
@@ -299,9 +301,10 @@ class RoomController extends Notifier<RoomState> {
       messages: [
         ...state.messages,
         RoomMessage(kind: MessageKind.gift, text: '${_me.name} sent ${gift.name} ×$qty to ${to.name}'),
+        if (res.luckyWin > 0) RoomMessage(kind: MessageKind.gift, text: 'Lucky! ${_me.name} won ${res.luckyWin} coins'),
       ],
     );
-    return true;
+    return res;
   }
 }
 

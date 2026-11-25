@@ -140,6 +140,8 @@ class Gift {
   final IconData icon;
   final Color tint;
   final bool fullScreen;
+  final String category; // popular, lucky, vip, special
+  final int vipLevel; // VIP level needed (vip gifts)
 
   const Gift({
     required this.id,
@@ -148,5 +150,7 @@ class Gift {
     required this.icon,
     required this.tint,
     this.fullScreen = false,
+    this.category = 'popular',
+    this.vipLevel = 0,
   });
 }

@@ -117,6 +117,17 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Data in `lib/data/family_providers.dart` (Laravel endpoints listed at the top).
 - Tests: `test/family_test.dart`; all 9 tests passing.
 
-## NEXT: Step 8 — Gifts & virtual items
-Gift store, receive gifts, gift categories, special gifts, gift history, my gifts, gift rankings,
-avatar items, frames, decorations, special effects.
+## Step 8 done — Gifts & virtual items
+- 17 gifts in 4 categories: Popular, Lucky (30% chance to win 2×/5×/10× back), VIP (needs VIP level), Special.
+- Gift store (Home → Gifts): category tabs, animated preview, buy to backpack, send to a friend.
+- Room gift panel tabs now work: Gifts / Lucky / VIP (locked by VIP level) / Backpack (free sends with counts).
+- Send gifts outside rooms from any user profile (gift button) — also posts a note in your chat.
+- Gift history (sent / received with totals), gift ranking (top senders / receivers).
+- My items (backpack): gifts + owned frames, entry effects, special effects, bubbles, themes, decorations; equip/unequip.
+- Shop gained Special effects and Decorations categories.
+- Data in `lib/data/gift_providers.dart` (single place every gift goes through; maps to Laravel POST /gifts/send).
+- Tests: `test/gifts_test.dart`; all 10 tests passing.
+
+## NEXT: Step 9 — Coins, wallet & shop
+Wallet page, recharge packages (Google Play billing later), purchase history, transactions,
+daily check-in, daily tasks, rewards, invite rewards, event rewards, gift cards, monthly packs, VIP purchase entry.

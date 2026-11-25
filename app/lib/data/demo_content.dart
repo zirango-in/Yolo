@@ -132,6 +132,10 @@ const demoShopItems = [
   ShopItem(8, 'Gold Bubble', 'bubble', 1200, '7 days', [Color(0xFFFFD97A), Color(0xFFE0A82E)], Icons.chat_rounded),
   ShopItem(9, 'Night City', 'theme', 2500, '30 days', [Color(0xFF0F172A), Color(0xFF6366F1)], Icons.location_city_rounded),
   ShopItem(10, 'Sakura Garden', 'theme', 2500, '30 days', [Color(0xFFF9A8D4), Color(0xFFDB2777)], Icons.local_florist_rounded),
+  ShopItem(11, 'Golden Name Card', 'decoration', 1800, '30 days', [Color(0xFFFFD97A), Color(0xFFE0A82E)], Icons.badge_rounded),
+  ShopItem(12, 'Neon Profile Card', 'decoration', 1500, '30 days', [Color(0xFF22D3EE), Color(0xFFA855F7)], Icons.style_rounded),
+  ShopItem(13, 'Sparkle Trail', 'effect', 3200, '7 days', [Color(0xFFFDE68A), Color(0xFFF472B6)], Icons.auto_awesome_rounded),
+  ShopItem(14, 'Fireworks Entry', 'effect', 6600, '7 days', [Color(0xFFF97316), Color(0xFFEF4444)], Icons.celebration_rounded),
 ];
 
 class FamilyInfo {

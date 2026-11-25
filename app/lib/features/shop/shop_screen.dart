@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
@@ -16,8 +17,8 @@ class ShopScreen extends ConsumerStatefulWidget {
 }
 
 class _ShopScreenState extends ConsumerState<ShopScreen> {
-  static const _tabs = ['Frames', 'Entry effects', 'Chat bubbles', 'Room themes'];
-  static const _cats = ['frame', 'entry', 'bubble', 'theme'];
+  static const _tabs = ['Frames', 'Entry effects', 'Special effects', 'Chat bubbles', 'Room themes', 'Decorations'];
+  static const _cats = ['frame', 'entry', 'effect', 'bubble', 'theme', 'decoration'];
   int _tab = 0;
 
   void _buy(ShopItem item) {
@@ -71,7 +72,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
     return YoloPage(
       title: 'Shop',
-      actions: [Padding(padding: const EdgeInsets.only(right: 4), child: CoinPill(coins: coins))],
+      actions: [
+        IconButton(tooltip: 'My items', icon: const Icon(Icons.backpack_rounded, color: YoloColors.gold), onPressed: () => context.push('/backpack')),
+        Padding(padding: const EdgeInsets.only(right: 4), child: CoinPill(coins: coins)),
+      ],
       bottom: YoloTabs(tabs: _tabs, index: _tab, onChanged: (i) => setState(() => _tab = i)),
       body: GridView.builder(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
