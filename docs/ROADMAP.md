@@ -108,9 +108,9 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Family · System · Events · Rewards
 
 ## Step 14 — Settings
-- [ ] Settings Home · Account · Privacy · Notifications · Sound · Language · Theme
-- [ ] Blocked Users · Permissions (Microphone · Camera · Gallery · Location)
-- [ ] Cache / Storage · Logout
+- [x] Settings Home · Account · Privacy · Notifications · Sound · Language · Theme
+- [x] Blocked Users · Permissions (Microphone · Camera · Gallery · Location)
+- [x] Cache / Storage · Logout
 
 ## Step 15 — Safety & Support
 - [ ] Help Center · Customer Service · Feedback · Bug Report

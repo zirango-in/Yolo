@@ -177,6 +177,17 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Data in `lib/data/notifications_providers.dart`; push delivery (FCM) comes with the Laravel backend.
 - Tests: `test/notifications_test.dart`; all 15 tests passing.
 
-## NEXT: Step 14 — Settings
-Settings home, account, privacy, notifications, sound, language, theme, blocked users,
-permissions (mic, camera, gallery, location), cache / storage, logout.
+## Step 14 done — Settings
+- Every Settings row now opens a working page (data in `lib/data/settings_providers.dart`):
+  Account & security, Privacy (who can message me, hide online / visitors / gift wall, show location),
+  Blocked users, Notifications (7 categories, sound, vibrate, do-not-disturb), Sound (room & effects volume,
+  gift sounds, noise suppression, vibration), Language (8 languages; Arabic/Urdu switch the app to
+  right-to-left — full translations need ARB language files), Theme & display (royal dark; light theme later;
+  text size small/default/large applied app-wide; reduce motion), Permissions (mic, camera, photos, location,
+  notifications via permission_handler; request / open phone settings), Cache & storage (breakdown + clear), Log out.
+- Android manifest now declares INTERNET, RECORD_AUDIO, CAMERA, READ_MEDIA_*, location, POST_NOTIFICATIONS.
+- Tests: `test/settings_test.dart`; all 16 tests passing.
+
+## NEXT: Step 15 — Safety & support
+Help center (FAQ), customer service chat, feedback, bug report, report user / room / post / game issue,
+block user, safety guidelines, privacy policy, terms of service, account deletion.

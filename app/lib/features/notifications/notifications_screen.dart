@@ -119,7 +119,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           onSelected: (v) {
             if (v == 'read') _ctrl.markAllRead();
             if (v == 'clear') _ctrl.clearAll();
-            if (v == 'settings') showYoloToast(context, 'Notification settings arrive in Step 14');
+            if (v == 'settings') context.push('/settings/notifications');
           },
           itemBuilder: (_) => const [
             PopupMenuItem(value: 'read', child: Text('Mark all as read')),

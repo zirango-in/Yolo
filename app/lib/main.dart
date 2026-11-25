@@ -7,6 +7,7 @@ import 'core/theme.dart';
 import 'data/models.dart';
 import 'data/events_providers.dart';
 import 'data/providers.dart';
+import 'data/settings_providers.dart';
 import 'data/social_providers.dart';
 import 'features/account/account_screen.dart';
 import 'features/auth/email_login_screen.dart';
@@ -34,6 +35,7 @@ import 'features/profile/user_profile_screen.dart';
 import 'features/rankings/rankings_screen.dart';
 import 'features/room/create_room_screen.dart';
 import 'features/room/room_screen.dart';
+import 'features/settings/settings_pages.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/shop/shop_screen.dart';
 import 'features/vip/vip_pages.dart';
@@ -122,6 +124,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/rewards/invite', builder: (_, _) => const InviteScreen()),
       GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+      GoRoute(path: '/settings/privacy', builder: (_, _) => const PrivacySettingsScreen()),
+      GoRoute(path: '/settings/notifications', builder: (_, _) => const NotificationSettingsScreen()),
+      GoRoute(path: '/settings/sound', builder: (_, _) => const SoundSettingsScreen()),
+      GoRoute(path: '/settings/language', builder: (_, _) => const LanguageSettingsScreen()),
+      GoRoute(path: '/settings/display', builder: (_, _) => const DisplaySettingsScreen()),
+      GoRoute(path: '/settings/permissions', builder: (_, _) => const PermissionsScreen()),
+      GoRoute(path: '/settings/storage', builder: (_, _) => const StorageScreen()),
     ],
   );
 });
@@ -136,6 +145,14 @@ class YoloApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: buildYoloTheme(),
       routerConfig: ref.watch(routerProvider),
+      // Apply text size, right-to-left languages and reduced motion app-wide.
+      builder: (context, child) {
+        final s = ref.watch(settingsProvider);
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(s.textScale), disableAnimations: s.reduceMotion),
+          child: Directionality(textDirection: s.isRtl ? TextDirection.rtl : TextDirection.ltr, child: child!),
+        );
+      },
     );
   }
 }

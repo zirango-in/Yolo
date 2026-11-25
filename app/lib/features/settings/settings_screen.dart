@@ -6,7 +6,7 @@ import '../../core/theme.dart';
 import '../../data/providers.dart';
 import '../../widgets/page_kit.dart';
 
-/// Settings home. Detail pages are built in Step 14.
+/// Settings home: links to every settings page.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -50,8 +50,15 @@ class SettingsScreen extends ConsumerWidget {
                   trailing: const Icon(Icons.chevron_right_rounded, color: YoloColors.textMuted),
                   onTap: () => switch (label) {
                     'Account & security' => context.push('/account'),
+                    'Privacy' => context.push('/settings/privacy'),
                     'Blocked users' => context.push('/blocked'),
-                    _ => showYoloToast(context, '$label arrives in Step 14'),
+                    'Notifications' => context.push('/settings/notifications'),
+                    'Sound' => context.push('/settings/sound'),
+                    'Language' => context.push('/settings/language'),
+                    'Theme' => context.push('/settings/display'),
+                    'Permissions' => context.push('/settings/permissions'),
+                    'Clear cache' => context.push('/settings/storage'),
+                    _ => showYoloToast(context, '$label arrives in Step 15'),
                   },
                 ),
             ]),
