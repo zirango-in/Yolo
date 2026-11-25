@@ -244,30 +244,28 @@ class _Header extends ConsumerWidget {
                 behavior: HitTestBehavior.opaque,
                 onTap: () => showRoomInfoSheet(context, ref, room),
                 child: Row(children: [
-                  RoomCover(room: room, name: name, coverPath: cover, size: 42, radius: 12),
-                  const SizedBox(width: 8),
+                  RoomCover(room: room, name: name, coverPath: cover, size: 44, radius: 12),
+                  const SizedBox(width: 10),
                   Flexible(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                       Row(mainAxisSize: MainAxisSize.min, children: [
                         if (locked) Padding(padding: const EdgeInsets.only(right: 3), child: Icon(Icons.lock_rounded, size: 12, color: look.accent)),
-                        Flexible(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, height: 1.15))),
+                        Flexible(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, height: 1.2))),
                       ]),
                       const SizedBox(height: 3),
                       Row(mainAxisSize: MainAxisSize.min, children: [
                         Container(
-                          padding: const EdgeInsets.fromLTRB(2, 1, 5, 1),
-                          decoration: BoxDecoration(color: levelColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.fromLTRB(2, 1, 6, 1),
+                          decoration: BoxDecoration(color: levelColor.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(8)),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
-                            RoomLevelBadge(lvl, size: 12),
+                            RoomLevelBadge(lvl, size: 13),
                             const SizedBox(width: 3),
-                            Text('Level $lvl', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: levelColor, height: 1.2)),
+                            Text('Level $lvl', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: levelColor)),
                           ]),
                         ),
-                        const SizedBox(width: 5),
-                        Flexible(
-                          child: Text('Room ID: ${room.id}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 9.5, color: YoloColors.textSoft)),
-                        ),
                       ]),
+                      const SizedBox(height: 2),
+                      Text('Room ID: ${room.id}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 9.5, color: Color(0xFFC4B8E6))),
                     ]),
                   ),
                 ]),
@@ -296,7 +294,7 @@ class _Header extends ConsumerWidget {
               ),
             ),
           ),
-          IconButton(tooltip: 'Room menu', visualDensity: VisualDensity.compact, icon: const Icon(Icons.more_horiz_rounded), onPressed: onMenu),
+          IconButton(tooltip: 'Room menu', visualDensity: VisualDensity.compact, padding: EdgeInsets.zero, constraints: const BoxConstraints(minWidth: 36, minHeight: 40), icon: const Icon(Icons.more_vert_rounded, size: 22), onPressed: onMenu),
         ]),
         if (showGroup)
           Padding(
@@ -351,6 +349,7 @@ class _Header extends ConsumerWidget {
 }
 
 /// Top three contributors (by Charms they gave in this room, highest first).
+/// Each picture carries its Charms number in a small tag attached to its bottom edge.
 class _TopContributors extends StatelessWidget {
   const _TopContributors({required this.rows, required this.onTap});
   final List<(YoloUser, int)> rows;
@@ -359,6 +358,7 @@ class _TopContributors extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (rows.isEmpty) return const SizedBox.shrink();
+    final look = RoomLookScope.of(context);
     return Semantics(
       button: true,
       excludeSemantics: true,
@@ -371,30 +371,32 @@ class _TopContributors extends StatelessWidget {
             Padding(
               key: ValueKey(u.id),
               padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                YoloAvatar(user: u, size: 26, plain: true),
-                const SizedBox(height: 2),
-                CharmsValue(charms),
-              ]),
+              child: SizedBox(
+                width: 34,
+                height: 38,
+                child: Stack(alignment: Alignment.topCenter, clipBehavior: Clip.none, children: [
+                  YoloAvatar(user: u, size: 30, plain: true),
+                  Positioned(
+                    bottom: 0,
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 26),
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: look.bg.last,
+                        borderRadius: BorderRadius.circular(7),
+                        border: Border.all(color: look.accent.withValues(alpha: 0.7), width: 0.8),
+                      ),
+                      child: Text(compactCount(charms),
+                          textAlign: TextAlign.center, style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, height: 1.1)),
+                    ),
+                  ),
+                ]),
+              ),
             ),
         ]),
       ),
     );
   }
-}
-
-/// Charms count with the charm sparkle (Charms = value of gifts given).
-class CharmsValue extends StatelessWidget {
-  const CharmsValue(this.value, {super.key, this.size = 9});
-  final int value;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.auto_awesome_rounded, size: size, color: const Color(0xFFF0ABFC)),
-        const SizedBox(width: 1),
-        Text(compactCount(value), style: TextStyle(fontSize: size, fontWeight: FontWeight.w800, color: const Color(0xFFF5D0FE), height: 1)),
-      ]);
 }
 
 // ---------------------------------------------------------------------------
@@ -431,7 +433,7 @@ class _StageArea extends ConsumerWidget {
     return Column(children: [
       // Host row — fixed height; the music disc sits in its own corner so it never covers a seat.
       SizedBox(
-        height: 108,
+        height: 124,
         child: Stack(children: [
           Center(
             child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -444,7 +446,7 @@ class _StageArea extends ConsumerWidget {
                   child: GestureDetector(
                     onTap: () => onUser(room.owner),
                     child: Column(children: [
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 18),
                       YoloAvatar(user: room.owner, size: 72, goldFrame: true, speaking: true, ringColor: look.accent),
                       const SizedBox(height: 5),
                       Text(room.owner.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
@@ -453,12 +455,12 @@ class _StageArea extends ConsumerWidget {
                 ),
               ),
               if (intimacy) ...[
-                const Padding(padding: EdgeInsets.only(top: 32), child: HeartbeatLine(width: 44)),
-                SizedBox(width: sideWidth, child: Padding(padding: const EdgeInsets.only(top: 4), child: seatTile(seats.first, size: 72))),
+                const Padding(padding: EdgeInsets.only(top: 46), child: HeartbeatLine(width: 44)),
+                SizedBox(width: sideWidth, child: Padding(padding: const EdgeInsets.only(top: 18), child: seatTile(seats.first, size: 72))),
               ],
             ]),
           ),
-          Positioned(right: 10, top: 10, child: _MusicDisc(room: room)),
+          Positioned(right: 10, top: 20, child: _MusicDisc(room: room)),
         ]),
       ),
       RoomModeStage(room: room),
@@ -881,16 +883,8 @@ class _BottomBar extends ConsumerWidget {
                 isDense: true,
                 filled: true,
                 fillColor: look.panel,
-                contentPadding: const EdgeInsets.only(left: 14),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(_d / 2), borderSide: BorderSide.none),
-                suffixIconConstraints: const BoxConstraints(minWidth: _d, minHeight: _d),
-                suffixIcon: chatLocked
-                    ? null
-                    : Semantics(
-                        button: true,
-                        label: 'Send',
-                        child: InkResponse(onTap: onSend, radius: 18, child: Icon(Icons.send_rounded, color: look.accent, size: 18)),
-                      ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               ),
             ),
           ),

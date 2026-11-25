@@ -59,11 +59,11 @@ void main() {
     await tester.tap(find.text('Take this seat'));
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.bySemanticsLabel('Take seat 4'), findsNothing);
-    expect(find.bySemanticsLabel('Send'), findsOneWidget);
+    expect(find.byIcon(Icons.send_rounded), findsNothing); // no arrow in the chat box
 
-    // Chat
+    // Chat: sent with the keyboard's send key
     await tester.enterText(find.byType(TextField), 'Hello Yolo');
-    await tester.tap(find.bySemanticsLabel('Send'));
+    await tester.testTextInput.receiveAction(TextInputAction.send);
     await settle(tester); // let the chat scroll to the new message
     expect(find.textContaining('Hello Yolo'), findsOneWidget);
 

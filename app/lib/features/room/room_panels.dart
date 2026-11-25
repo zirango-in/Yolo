@@ -125,7 +125,7 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
                 borderRadius: BorderRadius.circular(14),
                 onTap: onTap,
                 child: Container(
-                  height: 54,
+                  height: 58,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.10),
@@ -147,7 +147,7 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
           );
 
       return SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             ClipRRect(
@@ -163,12 +163,13 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
                       ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const SizedBox(height: 2),
                 Text(st.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, height: 1.2)),
-                const SizedBox(height: 5),
-                Wrap(spacing: 6, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                const SizedBox(height: 8),
+                Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
                   Container(
                     padding: const EdgeInsets.fromLTRB(2, 1, 6, 1),
                     decoration: BoxDecoration(color: levelColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
@@ -218,10 +219,10 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
           ]),
           // Follow / unfollow lives here (not on the main room screen).
           if (!isOwner) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 18),
             SizedBox(
               width: double.infinity,
-              height: 38,
+              height: 42,
               child: ctrl.isMember
                   ? OutlinedButton.icon(
                       onPressed: () {
@@ -240,9 +241,9 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
                     ),
             ),
           ],
-          const SizedBox(height: 10),
+          const SizedBox(height: 18),
           GlassCard(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             onTap: () {
               Navigator.pop(c);
               context.push('/room/level', extra: room);
@@ -270,15 +271,15 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
               const Icon(Icons.chevron_right_rounded),
             ]),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 22),
           const Text('Owner, partner & admins', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: YoloColors.textMuted)),
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
           SizedBox(
-            height: 92,
+            height: 96,
             child: ListView(scrollDirection: Axis.horizontal, children: [
               for (final id in staff)
                 Padding(
-                  padding: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsets.only(right: 18),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.pop(c);
@@ -295,20 +296,20 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
                 ),
             ]),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Row(children: [
             countCard('Online', formatCoins(st.onlineCount), YoloColors.online, () {
               Navigator.pop(c);
               showMembersSheet(context, ref, room);
             }),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             countCard('Members', formatCoins(st.memberCount), look.accent, () {
               Navigator.pop(c);
               showMembersSheet(context, ref, room, tab: 1);
             }),
           ]),
           if (group != null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             ListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
@@ -321,15 +322,15 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
               },
             ),
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           Row(children: [
             Text('Fans ${formatCoins(st.fans)}', style: const TextStyle(fontSize: 12, color: YoloColors.textMuted)),
             const SizedBox(width: 14),
             Text('Max members ${formatCoins(lvl.maxMembers)}', style: const TextStyle(fontSize: 12, color: YoloColors.textMuted)),
           ]),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Text('Announcement', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: look.accent)),
-          const SizedBox(height: 3),
+          const SizedBox(height: 6),
           Text(st.announcement.isEmpty ? 'No announcement yet' : st.announcement, style: const TextStyle(fontSize: 13, height: 1.4)),
         ]),
       );

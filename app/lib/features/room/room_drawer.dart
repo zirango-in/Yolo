@@ -105,7 +105,7 @@ class _RoomDrawer extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 4, 4, 0),
             child: Row(children: [
               const Expanded(child: Text('Room mode', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: YoloColors.textSoft))),
-              IconButton(tooltip: 'Close room menu', icon: const Icon(Icons.more_horiz_rounded), onPressed: () => Navigator.pop(context)),
+              IconButton(tooltip: 'Close room menu', icon: const Icon(Icons.more_vert_rounded), onPressed: () => Navigator.pop(context)),
             ]),
           ),
           // Room modes (scrolls sideways on narrow phones)
