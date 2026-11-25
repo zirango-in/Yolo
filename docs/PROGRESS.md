@@ -96,6 +96,17 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Real audio recording needs the `record` package + microphone permission (do with Laravel upload API).
 - Tests: `test/friends_chat_test.dart`; all 7 tests passing.
 
-## NEXT: Step 6 — Moments / social feed
-Create post, upload photo/video, caption, topic, comments, share, follow topics, post details,
-delete post, report post.
+## Step 6 done — Moments
+- Feed tabs: Trending, Following (people + followed topics + my posts), Topics (chips, follow/unfollow topic).
+- Create post: caption (500 chars), up to 9 photos (gallery multi-pick) or 1 video, topic picker.
+- Post card: like (animated), comments count, share (to a friend's chat or copy link), options
+  (copy link, delete my post, report others' posts). Tap a topic tag → that topic's feed.
+- Post details: full post + comments list + add comment.
+- Profile "My moments" shows my real posts; Discover topic chips open the topic feed.
+- Video playback is a placeholder card for now (needs video_player + Laravel upload).
+- Tests: `test/moments_test.dart`; all 8 tests passing.
+
+## NEXT: Step 7 — Family
+Create family, search, profile, roles (leader/deputy/admin), level, funds/coins, quests, donations,
+activeness, gacha/daily free roll, chests, rewards, family shop, title, frame, sign-in, rankings,
+upgrade, leave.

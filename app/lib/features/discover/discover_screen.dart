@@ -57,7 +57,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (_, i) => ActionChip(
                 label: Text(topics[i]),
-                onPressed: () => context.push('/moments'),
+                onPressed: () => context.push('/moments/topic', extra: topics[i]),
                 shape: const StadiumBorder(),
                 side: BorderSide(color: YoloColors.gold.withValues(alpha: 0.3)),
                 backgroundColor: YoloColors.gold.withValues(alpha: 0.08),

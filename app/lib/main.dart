@@ -20,7 +20,9 @@ import 'features/family/family_screen.dart';
 import 'features/friends/friends_screen.dart';
 import 'features/games/game_center_screen.dart';
 import 'features/messages/messages_screen.dart';
+import 'features/moments/create_post_screen.dart';
 import 'features/moments/moments_screen.dart';
+import 'data/demo_content.dart';
 import 'features/notifications/notifications_screen.dart';
 import 'features/profile/avatar_studio_screen.dart';
 import 'features/profile/edit_profile_screen.dart';
@@ -84,6 +86,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/blocked', builder: (_, _) => const BlockedUsersScreen()),
       GoRoute(path: '/user', builder: (_, state) => UserProfileScreen(user: state.extra! as YoloUser)),
       GoRoute(path: '/moments', builder: (_, _) => const MomentsScreen()),
+      GoRoute(path: '/moments/new', builder: (_, _) => const CreatePostScreen()),
+      GoRoute(path: '/moments/post', builder: (_, state) => PostDetailsScreen(moment: state.extra! as Moment)),
+      GoRoute(path: '/moments/topic', builder: (_, state) => MomentsScreen(topic: state.extra as String?)),
       GoRoute(path: '/family', builder: (_, _) => const FamilyScreen()),
       GoRoute(path: '/events', builder: (_, _) => const EventsScreen()),
       GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),

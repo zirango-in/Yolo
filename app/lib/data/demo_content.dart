@@ -41,8 +41,10 @@ class Moment {
   final String time;
   final int likes;
   final int comments;
-  final List<Color>? photo;
-  const Moment(this.id, this.author, this.text, this.topic, this.time, this.likes, this.comments, {this.photo});
+  final List<Color>? photo; // demo placeholder image
+  final List<String> images; // real picked photos
+  final String? video; // real picked video
+  const Moment(this.id, this.author, this.text, this.topic, this.time, this.likes, this.comments, {this.photo, this.images = const [], this.video});
 }
 
 const demoMoments = [

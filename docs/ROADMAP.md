@@ -67,9 +67,9 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Online Status · Block List · Report User
 
 ## Step 6 — Moments / Social Feed
-- [ ] Feed · Create Post · Upload Photo · Upload Video · Caption · Topic / Area
-- [ ] Like · Comment · Share · Follow Topics
-- [ ] User Posts · Post Details · Delete Post · Report Post
+- [x] Feed · Create Post · Upload Photo · Upload Video · Caption · Topic / Area
+- [x] Like · Comment · Share · Follow Topics
+- [x] User Posts · Post Details · Delete Post · Report Post
 
 ## Step 7 — Family
 - [ ] Family Home · Create · Join · Search · Profile · Members

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
-import '../../data/demo_content.dart';
+import '../../data/moments_providers.dart';
 import '../../data/profile_providers.dart';
 import '../../data/providers.dart';
 import '../../data/social_providers.dart';
@@ -47,7 +47,7 @@ class ProfileScreen extends ConsumerWidget {
       (Icons.manage_accounts_rounded, 'Account', '', const Color(0xFF7DD3FC), '/account'),
       (Icons.settings_rounded, 'Settings', '', YoloColors.textSoft, '/settings'),
     ];
-    final myMoments = demoMoments.take(2).toList();
+    final myMoments = ref.watch(momentsProvider).where((m) => m.author.id == me.id).take(3).toList();
 
     return ListView(
       padding: EdgeInsets.only(bottom: 120 + MediaQuery.paddingOf(context).bottom),
@@ -205,11 +205,14 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ]),
         ),
-        SectionTitle('My moments', action: 'See all', onAction: () => context.push('/moments')),
+        SectionTitle('My moments', action: 'New post', onAction: () => context.push('/moments/new')),
+        if (myMoments.isEmpty)
+          const Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 8), child: Text('You have not posted yet', style: TextStyle(color: YoloColors.textMuted))),
         for (final m in myMoments)
           GlassCard(
             margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
             padding: const EdgeInsets.all(12),
+            onTap: () => context.push('/moments/post', extra: m),
             child: Row(children: [
               if (m.photo != null) ...[
                 Container(width: 54, height: 54, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), gradient: LinearGradient(colors: m.photo!))),
