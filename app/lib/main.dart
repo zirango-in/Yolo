@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'core/theme.dart';
 import 'data/models.dart';
 import 'data/providers.dart';
+import 'data/social_providers.dart';
 import 'features/account/account_screen.dart';
 import 'features/auth/email_login_screen.dart';
 import 'features/auth/login_screen.dart';
@@ -73,7 +74,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen()),
       GoRoute(path: '/games', builder: (_, _) => const GameCenterScreen()),
       GoRoute(path: '/friends', builder: (_, _) => const FriendsScreen()),
-      GoRoute(path: '/chat', builder: (_, state) => ChatScreen(user: state.extra! as YoloUser)),
+      GoRoute(
+        path: '/chat',
+        builder: (_, state) => state.extra is GroupChat ? ChatScreen(group: state.extra! as GroupChat) : ChatScreen(user: state.extra! as YoloUser),
+      ),
+      GoRoute(path: '/chat/new-group', builder: (_, _) => const CreateGroupScreen()),
+      GoRoute(path: '/friends/requests', builder: (_, _) => const FriendRequestsScreen()),
+      GoRoute(path: '/friends/add', builder: (_, _) => const AddFriendsScreen()),
+      GoRoute(path: '/blocked', builder: (_, _) => const BlockedUsersScreen()),
       GoRoute(path: '/user', builder: (_, state) => UserProfileScreen(user: state.extra! as YoloUser)),
       GoRoute(path: '/moments', builder: (_, _) => const MomentsScreen()),
       GoRoute(path: '/family', builder: (_, _) => const FamilyScreen()),

@@ -25,7 +25,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     final rooms = ref.watch(roomsProvider('popular')).value ?? const [];
     final following = ref.watch(followingProvider);
     final q = _q.toLowerCase();
-    final users = demoAllUsers.where((u) => q.isEmpty || u.name.toLowerCase().contains(q) || '${u.id}'.contains(q)).toList();
+    final blocked = ref.watch(blockedProvider);
+    final users = demoAllUsers.where((u) => !blocked.contains(u.id)).where((u) => q.isEmpty || u.name.toLowerCase().contains(q) || '${u.id}'.contains(q)).toList();
     final filteredRooms = rooms.where((r) => q.isEmpty || r.name.toLowerCase().contains(q) || '${r.id}'.contains(q)).toList();
     const topics = ['#Ludo', '#Music', '#Life', '#Family', '#Gaming', '#Poetry', '#Friends'];
 

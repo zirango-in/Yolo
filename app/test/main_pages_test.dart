@@ -121,6 +121,7 @@ void main() {
     await tester.tap(find.text('Zara').first);
     await settle(tester);
     await tester.enterText(find.byType(TextField), 'Hi Zara!');
+    await settle(tester);
     await tester.tap(find.byTooltip('Send'));
     await settle(tester);
     expect(find.text('Hi Zara!'), findsOneWidget);

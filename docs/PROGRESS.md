@@ -84,6 +84,18 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Real live voice still needs Agora + Laravel token endpoint.
 - Tests: `test/voice_room_test.dart`; all 6 tests passing.
 
-## NEXT: Step 5 — Friends & chat
-Friend requests, add friends, search by Yolo ID, mutual friends, group chat, chat history,
-voice messages, image sharing, online status, block list, report user.
+## Step 5 done — Friends & chat
+- Friends page: Friends (mutual follows) / Following / Followers, online status + last seen, requests banner.
+- Friend requests page: accept / decline received, cancel sent. Add friends: search by name or exact Yolo ID.
+- Messages: Requests shortcut with badge, Groups section, new group (pick 2+ friends), add-friends button.
+- Chat: online status in header, text, photo sharing (gallery), hold-to-record voice messages with
+  playback animation (demo: no real audio recorded yet), chat history kept per chat, clear history,
+  block / unblock (input disabled while blocked), report user. Group chat shows sender names.
+- Block list page (Settings → Blocked users); blocked users hidden in Messages, Friends, Discover.
+- Fixed: voice message was not sent on release (mic button disappeared while recording).
+- Real audio recording needs the `record` package + microphone permission (do with Laravel upload API).
+- Tests: `test/friends_chat_test.dart`; all 7 tests passing.
+
+## NEXT: Step 6 — Moments / social feed
+Create post, upload photo/video, caption, topic, comments, share, follow topics, post details,
+delete post, report post.

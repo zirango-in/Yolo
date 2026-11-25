@@ -60,11 +60,11 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [ ] [api] Real live voice (Agora)
 
 ## Step 5 — Friends & Chat
-- [ ] Friends List · Add Friends · Search User · Search by Yolo ID · Friend Requests
-- [ ] Following · Followers · Mutual Friends
-- [ ] Private Chat · Group Chat · Chat History
-- [ ] Text Messages · Voice Messages · Image Sharing
-- [ ] Online Status · Block List · Report User
+- [x] Friends List · Add Friends · Search User · Search by Yolo ID · Friend Requests
+- [x] Following · Followers · Mutual Friends
+- [x] Private Chat · Group Chat · Chat History
+- [x] Text Messages · Voice Messages · Image Sharing
+- [x] Online Status · Block List · Report User
 
 ## Step 6 — Moments / Social Feed
 - [ ] Feed · Create Post · Upload Photo · Upload Video · Caption · Topic / Area

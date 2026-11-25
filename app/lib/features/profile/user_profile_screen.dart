@@ -9,19 +9,19 @@ import '../../data/profile_providers.dart';
 import '../../data/social_providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/page_kit.dart';
+import '../room/room_sheets.dart';
 
 /// Another user's profile: cover, stats, follow/friend status, badges, gift wall, moments.
 class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key, required this.user});
   final YoloUser user;
 
-  static const _followsMe = {2001, 2002, 2003};
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final following = ref.watch(followingProvider);
     final iFollow = following.contains(user.id);
-    final theyFollow = _followsMe.contains(user.id);
+    final theyFollow = ref.watch(followersProvider).contains(user.id);
+    final isBlocked = ref.watch(blockedProvider).contains(user.id);
     final relation = iFollow && theyFollow ? 'Friends' : (theyFollow ? 'Follows you' : (iFollow ? 'You follow' : ''));
     final mutual = demoAllUsers.where((u) => u.id != user.id && following.contains(u.id)).take(3).toList();
     final moments = demoMoments.where((m) => m.author.id == user.id).toList();
@@ -43,8 +43,18 @@ class UserProfileScreen extends ConsumerWidget {
               PopupMenuButton<String>(
                 tooltip: 'More',
                 icon: const Icon(Icons.more_horiz_rounded),
-                onSelected: (v) => showYoloToast(context, v == 'block' ? '${user.name} blocked' : 'Report sent. Thank you.'),
-                itemBuilder: (_) => const [PopupMenuItem(value: 'report', child: Text('Report')), PopupMenuItem(value: 'block', child: Text('Block'))],
+                onSelected: (v) {
+                  if (v == 'report') {
+                    showReportSheet(context, 'user');
+                  } else {
+                    ref.read(blockedProvider.notifier).toggle(user.id);
+                    showYoloToast(context, isBlocked ? '${user.name} unblocked' : '${user.name} blocked');
+                  }
+                },
+                itemBuilder: (_) => [
+                  const PopupMenuItem(value: 'report', child: Text('Report')),
+                  PopupMenuItem(value: 'block', child: Text(isBlocked ? 'Unblock' : 'Block')),
+                ],
               ),
             ]),
           ),
