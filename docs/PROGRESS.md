@@ -36,3 +36,16 @@ Read this first when starting a new session: it says exactly where we stopped.
   Settings home, other user profile (follow, message, report/block).
 - Tests: `test/app_flow_test.dart`, `test/main_pages_test.dart` — passing.
 - Next: Step 2 (login & account pages).
+
+## Step 2 done — Login & account
+- Welcome carousel (3 slides) → Login (phone, Google, email, guest).
+- Phone login: country code, validation → OTP screen (6 boxes, 60s resend timer, wrong-code error;
+  demo code 123456) → registration (nickname, gender, birthday, 18+ check).
+- Email login with validation, forgot password → account recovery (phone OTP, email reset link, support).
+- Account page (Settings → Account & security): copy Yolo ID, buy lucky number, change nickname,
+  change phone (OTP), link/unlink Phone/Email/Google/Facebook/Apple (keeps at least one), delete account (type DELETE).
+- Guest accounts show a warning to bind a login method.
+- Test `test/auth_account_test.dart` (full flows) + earlier tests: 4 passing.
+- Laravel endpoints needed: /auth/otp/send, /auth/otp/verify, /auth/email/login, /auth/password/forgot,
+  /auth/guest, /me/profile, /me/account/bindings, /me/lucky-id, DELETE /me.
+- Next: Step 3 (user profile pages).

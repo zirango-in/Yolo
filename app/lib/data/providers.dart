@@ -20,6 +20,18 @@ class SessionController extends Notifier<YoloUser?> {
     state = await ref.read(repositoryProvider).login(method: method);
   }
 
+  void loginAs(YoloUser user) => state = user;
+
+  void updateProfile({String? name, String? gender, int? age}) {
+    final me = state;
+    if (me != null) state = me.copyWith(name: name, gender: gender, age: age);
+  }
+
+  void changeId(int id) {
+    final me = state;
+    if (me != null) state = me.copyWith(id: id);
+  }
+
   void logout() => state = null;
 
   /// Returns false when the balance is too low.

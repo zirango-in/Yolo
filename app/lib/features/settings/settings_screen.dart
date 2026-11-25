@@ -48,7 +48,7 @@ class SettingsScreen extends ConsumerWidget {
                   leading: TintIcon(icon, color: color, size: 36),
                   title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
                   trailing: const Icon(Icons.chevron_right_rounded, color: YoloColors.textMuted),
-                  onTap: () => showYoloToast(context, '$label arrives in Step 14'),
+                  onTap: () => label == 'Account & security' ? context.push('/account') : showYoloToast(context, '$label arrives in Step 14'),
                 ),
             ]),
           ),

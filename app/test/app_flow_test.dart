@@ -33,8 +33,9 @@ void main() {
     await settle(tester);
 
     // Login
-    expect(find.text('Continue with phone'), findsOneWidget);
-    await tester.tap(find.text('Continue with phone'));
+    await tester.tap(find.text('Skip'));
+    await settle(tester);
+    await tester.tap(find.text('Continue with Google'));
     await settle(tester);
     await settle(tester);
 

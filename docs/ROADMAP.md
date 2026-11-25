@@ -25,21 +25,21 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Notifications Page
 
 ## Step 2 — Login & Account
-- [ ] Welcome Page
-- [ ] Login Page
-- [ ] Phone Number Login
-- [ ] Email Login
-- [ ] Guest Login
-- [ ] Account Registration
-- [ ] OTP Verification
-- [ ] Account Binding
-- [ ] Account Management
-- [ ] Change Phone Number
-- [ ] Change Nickname
-- [ ] Yolo ID (UID)
-- [ ] Lucky Number
-- [ ] Account Recovery
-- [ ] Delete Account
+- [x] Welcome Page
+- [x] Login Page
+- [x] Phone Number Login
+- [x] Email Login
+- [x] Guest Login
+- [x] Account Registration
+- [x] OTP Verification
+- [x] Account Binding
+- [x] Account Management
+- [x] Change Phone Number
+- [x] Change Nickname
+- [x] Yolo ID (UID)
+- [x] Lucky Number
+- [x] Account Recovery
+- [x] Delete Account
 
 ## Step 3 — User Profile
 - [ ] My Profile · Other User Profile · Edit Profile · Profile Photo

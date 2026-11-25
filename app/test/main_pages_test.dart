@@ -25,7 +25,9 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     await tester.pumpWidget(const ProviderScope(child: YoloApp()));
     await settle(tester);
-    await tester.tap(find.text('Continue with phone'));
+    await tester.tap(find.text('Skip'));
+    await settle(tester);
+    await tester.tap(find.text('Continue with Google'));
     await settle(tester);
     await settle(tester);
 

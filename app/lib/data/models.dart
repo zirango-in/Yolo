@@ -33,11 +33,11 @@ class YoloUser {
 
   String get initial => name.isEmpty ? '?' : name[0].toUpperCase();
 
-  YoloUser copyWith({int? coins}) => YoloUser(
-        id: id,
-        name: name,
-        gender: gender,
-        age: age,
+  YoloUser copyWith({int? coins, String? name, String? gender, int? age, int? id}) => YoloUser(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        gender: gender ?? this.gender,
+        age: age ?? this.age,
         level: level,
         vipLevel: vipLevel,
         coins: coins ?? this.coins,

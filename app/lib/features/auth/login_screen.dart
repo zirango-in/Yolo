@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
+import '../../data/account_providers.dart';
+import '../../data/models.dart';
 import '../../data/providers.dart';
 import '../../widgets/common.dart';
 
@@ -19,7 +21,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _login(String method) async {
     setState(() => _loading = method);
-    await ref.read(sessionProvider.notifier).login(method);
+    if (method == 'guest') {
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      ref.read(sessionProvider.notifier).loginAs(const YoloUser(id: 9900001, name: 'Guest', coins: 100));
+    } else {
+      await ref.read(sessionProvider.notifier).login(method);
+    }
+    ref.read(accountProvider.notifier).signedInWith(method, email: method == 'google' ? 'aria@gmail.com' : '');
     if (mounted) context.go('/home');
   }
 
@@ -72,12 +80,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       style: TextStyle(fontSize: 15, color: YoloColors.textSoft))
                   .animate()
                   .fadeIn(delay: 350.ms, duration: 500.ms),
-              const Spacer(flex: 4),
+              const Spacer(flex: 3),
               GoldButton(
                 label: 'Continue with phone',
                 icon: Icons.smartphone_rounded,
                 loading: _loading == 'phone',
-                onPressed: () => _login('phone'),
+                onPressed: () => context.push('/login/phone'),
               ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.4, end: 0),
               const SizedBox(height: 12),
               SizedBox(
@@ -97,7 +105,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   label: const Text('Continue with Google', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                 ),
               ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.4, end: 0),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                TextButton.icon(
+                  onPressed: () => context.push('/login/email'),
+                  icon: const Icon(Icons.mail_outline_rounded, size: 18),
+                  label: const Text('Email'),
+                  style: TextButton.styleFrom(foregroundColor: YoloColors.textSoft),
+                ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: _loading == null ? () => _login('guest') : null,
+                  icon: const Icon(Icons.person_outline_rounded, size: 18),
+                  label: const Text('Guest'),
+                  style: TextButton.styleFrom(foregroundColor: YoloColors.textSoft),
+                ),
+              ]).animate().fadeIn(delay: 700.ms),
+              const SizedBox(height: 8),
               const Text('By continuing you agree to our Terms and Privacy Policy',
                   textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: YoloColors.textMuted)),
             ]),

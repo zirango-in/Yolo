@@ -6,7 +6,12 @@ import 'package:material_ui/material_ui.dart';
 import 'core/theme.dart';
 import 'data/models.dart';
 import 'data/providers.dart';
+import 'features/account/account_screen.dart';
+import 'features/auth/email_login_screen.dart';
 import 'features/auth/login_screen.dart';
+import 'features/auth/phone_flow.dart';
+import 'features/auth/register_screen.dart';
+import 'features/auth/welcome_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/discover/discover_screen.dart';
 import 'features/events/events_screen.dart';
@@ -33,14 +38,26 @@ void main() {
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/welcome',
     redirect: (context, state) {
       final loggedIn = ref.read(sessionProvider) != null;
-      if (!loggedIn && state.matchedLocation != '/login') return '/login';
+      final loc = state.matchedLocation;
+      final public = loc == '/welcome' || loc.startsWith('/login');
+      if (!loggedIn && !public) return '/welcome';
       return null;
     },
     routes: [
+      GoRoute(path: '/welcome', builder: (_, _) => const WelcomeScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
+      GoRoute(path: '/login/phone', builder: (_, state) => PhoneEntryScreen(purpose: state.extra as PhonePurpose? ?? PhonePurpose.login)),
+      GoRoute(path: '/login/otp', builder: (_, state) {
+        final (phone, purpose) = state.extra! as (String, PhonePurpose);
+        return OtpScreen(phone: phone, purpose: purpose);
+      }),
+      GoRoute(path: '/login/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(path: '/login/email', builder: (_, _) => const EmailLoginScreen()),
+      GoRoute(path: '/login/recover', builder: (_, _) => const RecoveryScreen()),
+      GoRoute(path: '/account', builder: (_, _) => const AccountScreen()),
       GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
       GoRoute(path: '/room', builder: (_, state) => RoomScreen(room: state.extra! as Room)),
       GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen()),
