@@ -23,9 +23,11 @@ class SessionController extends Notifier<YoloUser?> {
 
   void loginAs(YoloUser user) => state = user;
 
-  void earn(int coins) {
+  void earn(int coins, {String note = 'Reward'}) {
     final me = state;
-    if (me != null) state = me.copyWith(coins: me.coins + coins);
+    if (me == null) return;
+    state = me.copyWith(coins: me.coins + coins);
+    ref.read(ledgerProvider.notifier).add(coins, note);
   }
 
   void updateProfile({String? name, String? gender, int? age}) {
@@ -40,12 +42,37 @@ class SessionController extends Notifier<YoloUser?> {
 
   void logout() => state = null;
 
-  /// Returns false when the balance is too low.
-  bool spend(int coins) {
+  /// Returns false when the balance is too low. Every change is written to the wallet ledger.
+  bool spend(int coins, {String note = 'Spent'}) {
     final me = state;
     if (me == null || me.coins < coins) return false;
     state = me.copyWith(coins: me.coins - coins);
+    ref.read(ledgerProvider.notifier).add(-coins, note);
     return true;
+  }
+}
+
+/// Coin transaction record. Laravel: GET /wallet/transactions.
+class CoinTx {
+  final int amount; // + income, - spent
+  final String note;
+  final String time;
+  const CoinTx(this.amount, this.note, this.time);
+}
+
+final ledgerProvider = NotifierProvider<LedgerController, List<CoinTx>>(LedgerController.new);
+
+class LedgerController extends Notifier<List<CoinTx>> {
+  @override
+  List<CoinTx> build() => const [
+        CoinTx(5000, 'Recharge 5,000 coins', 'Mon 18:20'),
+        CoinTx(-520, 'Gift: Crown', 'Mon 21:05'),
+        CoinTx(100, 'Daily check-in', 'Sun 09:12'),
+      ];
+
+  void add(int amount, String note) {
+    final n = DateTime.now();
+    state = [CoinTx(amount, note, 'Today ${n.hour.toString().padLeft(2, '0')}:${n.minute.toString().padLeft(2, '0')}'), ...state];
   }
 }
 

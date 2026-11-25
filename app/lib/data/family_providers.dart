@@ -144,7 +144,7 @@ class FamilyController extends Notifier<FamilyState> {
 
   /// Returns '' on success or an error message.
   String create(YoloUser me, String name, String slogan, List<Color> colors) {
-    if (!ref.read(sessionProvider.notifier).spend(5000)) return 'Creating a family costs 5,000 coins';
+    if (!ref.read(sessionProvider.notifier).spend(5000, note: 'Create family')) return 'Creating a family costs 5,000 coins';
     final f = FamilyInfo(800000 + state.created.length, name, slogan, 1, 1, 50, colors);
     state = state.copyWith(created: [f, ...state.created], familyId: f.id, role: 'leader', level: 1, funds: 0, activeness: 0, memberRoles: {});
     return '';
@@ -159,7 +159,7 @@ class FamilyController extends Notifier<FamilyState> {
 
   /// Returns false when coins are not enough.
   bool donate(int coins) {
-    if (!ref.read(sessionProvider.notifier).spend(coins)) return false;
+    if (!ref.read(sessionProvider.notifier).spend(coins, note: 'Family donation')) return false;
     state = state.copyWith(funds: state.funds + coins, activeness: state.activeness + coins ~/ 20, familyCoins: state.familyCoins + coins ~/ 10);
     return true;
   }

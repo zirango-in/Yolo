@@ -63,13 +63,13 @@ class GiftCenter extends Notifier<GiftCenterState> {
       if (have < qty) return const SendResult(false, 'Not enough in your backpack');
       final bp = {...state.backpack, gift.id: have - qty}..removeWhere((_, v) => v <= 0);
       state = GiftCenterState(records: state.records, backpack: bp);
-    } else if (!ref.read(sessionProvider.notifier).spend(gift.price * qty)) {
+    } else if (!ref.read(sessionProvider.notifier).spend(gift.price * qty, note: 'Gift: ${gift.name} ×$qty')) {
       return const SendResult(false, 'Not enough coins. Recharge to send this gift.');
     }
     var win = 0;
     if (gift.category == 'lucky' && _rand.nextInt(100) < 30) {
       win = gift.price * qty * [2, 5, 10][_rand.nextInt(3)];
-      ref.read(sessionProvider.notifier).earn(win);
+      ref.read(sessionProvider.notifier).earn(win, note: 'Lucky gift win');
     }
     state = GiftCenterState(records: [GiftRecord(gift, me, to, qty, _now()), ...state.records], backpack: state.backpack);
     return SendResult(true, win > 0 ? 'Lucky! You won $win coins back' : 'Sent ${gift.name} ×$qty to ${to.name}', luckyWin: win);
@@ -77,7 +77,7 @@ class GiftCenter extends Notifier<GiftCenterState> {
 
   /// Buy gifts into the backpack to send later.
   bool buyToBackpack(Gift gift, int qty) {
-    if (!ref.read(sessionProvider.notifier).spend(gift.price * qty)) return false;
+    if (!ref.read(sessionProvider.notifier).spend(gift.price * qty, note: 'Bought ${gift.name} ×$qty')) return false;
     state = GiftCenterState(records: state.records, backpack: {...state.backpack, gift.id: (state.backpack[gift.id] ?? 0) + qty});
     return true;
   }

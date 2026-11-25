@@ -40,7 +40,8 @@ class ProfileScreen extends ConsumerWidget {
         );
 
     final menu = [
-      (Icons.account_balance_wallet_rounded, 'Wallet', formatCoins(me.coins), const Color(0xFFF5C451), '/shop'),
+      (Icons.account_balance_wallet_rounded, 'Wallet', formatCoins(me.coins), const Color(0xFFF5C451), '/wallet'),
+      (Icons.redeem_rounded, 'Rewards & check-in', '', const Color(0xFFF9A8D4), '/rewards'),
       (Icons.storefront_rounded, 'Shop', '', const Color(0xFFF9A8D4), '/shop'),
       (Icons.card_giftcard_rounded, 'Gift store', '', const Color(0xFFFDBA74), '/gifts'),
       (Icons.backpack_rounded, 'My items', '', const Color(0xFF86EFAC), '/backpack'),

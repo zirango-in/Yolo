@@ -85,10 +85,10 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Avatar Items · Avatar Frames · Decorations · Special Effects
 
 ## Step 9 — Coins, Wallet & Shop
-- [ ] Coins · Recharge [api: Google Play billing] · Purchase History · Transactions
-- [ ] Daily Check-in · Daily Tasks · Rewards · Invite Rewards · Event Rewards
-- [ ] Family Coins · Family Funds
-- [ ] Shop · Gift Cards · Virtual Items · Monthly Packs · VIP Purchase
+- [x] Coins · Recharge (demo; [api] Google Play billing) · Purchase History · Transactions
+- [x] Daily Check-in · Daily Tasks · Rewards · Invite Rewards · Event Rewards
+- [x] Family Coins · Family Funds
+- [x] Shop · Gift Cards · Virtual Items · Monthly Packs · VIP Purchase
 
 ## Step 10 — VIP Membership
 - [ ] VIP Center · Benefits · Levels · VIP Gifts · VIP Rings · Privileges

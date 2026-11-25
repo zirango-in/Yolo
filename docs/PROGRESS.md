@@ -128,6 +128,18 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Data in `lib/data/gift_providers.dart` (single place every gift goes through; maps to Laravel POST /gifts/send).
 - Tests: `test/gifts_test.dart`; all 10 tests passing.
 
-## NEXT: Step 9 — Coins, wallet & shop
-Wallet page, recharge packages (Google Play billing later), purchase history, transactions,
-daily check-in, daily tasks, rewards, invite rewards, event rewards, gift cards, monthly packs, VIP purchase entry.
+## Step 9 done — Coins, wallet & shop
+- Every coin change goes through `SessionController.spend/earn(note:)` and is written to `ledgerProvider`.
+- Wallet (tap coins on Home, or Me → Wallet): animated balance, diamonds + exchange (10 diamonds = 1 coin),
+  first-recharge double bonus, 6 recharge packages (demo payment), links to rewards, monthly pack,
+  transactions, purchase history, gift card redeem (demo codes YOLO100, WELCOME500, PARTY2026), shop,
+  VIP (Step 10), family coins.
+- Transactions (All / Income / Spent), Purchase history (orders with IDs).
+- Rewards center: 7-day check-in calendar, monthly pack (300 coins/day × 30 days), daily tasks claim,
+  invite friends (code, copy, share link, joined list), event rewards claim.
+- Real payments need Google Play Billing (`in_app_purchase`) + Laravel receipt verification.
+- Tests: `test/wallet_test.dart`; all 11 tests passing.
+
+## NEXT: Step 10 — VIP membership
+VIP center, benefits, levels, VIP gifts, VIP rings, privileges, monthly subscription,
+subscription management, VIP purchase history.

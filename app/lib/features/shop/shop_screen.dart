@@ -49,7 +49,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
             style: FilledButton.styleFrom(backgroundColor: YoloColors.gold, foregroundColor: YoloColors.onGold),
             onPressed: () {
               Navigator.pop(context);
-              if (ref.read(sessionProvider.notifier).spend(item.price)) {
+              if (ref.read(sessionProvider.notifier).spend(item.price, note: 'Shop: ${item.name}')) {
                 ref.read(ownedItemsProvider.notifier).add(item.id);
                 showYoloToast(context, 'Purchased! Find it in your backpack.');
               } else {

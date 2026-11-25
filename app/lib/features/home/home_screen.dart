@@ -160,7 +160,7 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
                           softWrap: false,
                           style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.5, color: YoloColors.gold)),
                     ),
-                    Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: CoinPill(coins: me?.coins ?? 0))),
+                    Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: CoinPill(coins: me?.coins ?? 0, onTap: () => context.push('/wallet')))),
                     const SizedBox(width: 10),
                     GlassIconButton(icon: Icons.search_rounded, label: 'Search', onTap: () => context.push('/discover')),
                     const SizedBox(width: 10),
@@ -253,7 +253,7 @@ class _QuickEntries extends StatelessWidget {
     (Icons.photo_library_rounded, 'Moments', Color(0xFF86EFAC), '/moments'),
     (Icons.people_alt_rounded, 'Friends', Color(0xFF93C5FD), '/friends'),
     (Icons.card_giftcard_rounded, 'Gifts', Color(0xFFFDBA74), '/gifts'),
-    (Icons.settings_rounded, 'Settings', Color(0xFFD9D0F2), '/settings'),
+    (Icons.redeem_rounded, 'Rewards', Color(0xFFD9D0F2), '/rewards'),
   ];
 
   @override

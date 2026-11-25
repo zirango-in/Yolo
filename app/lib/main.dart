@@ -34,6 +34,7 @@ import 'features/room/create_room_screen.dart';
 import 'features/room/room_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/shop/shop_screen.dart';
+import 'features/wallet/wallet_pages.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -105,6 +106,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/gifts/history', builder: (_, _) => const GiftHistoryScreen()),
       GoRoute(path: '/gifts/ranking', builder: (_, _) => const GiftRankingScreen()),
       GoRoute(path: '/backpack', builder: (_, _) => const BackpackScreen()),
+      GoRoute(path: '/wallet', builder: (_, _) => const WalletScreen()),
+      GoRoute(path: '/wallet/transactions', builder: (_, _) => const TransactionsScreen()),
+      GoRoute(path: '/wallet/purchases', builder: (_, _) => const PurchaseHistoryScreen()),
+      GoRoute(path: '/rewards', builder: (_, _) => const RewardsScreen()),
+      GoRoute(path: '/rewards/invite', builder: (_, _) => const InviteScreen()),
       GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
     ],
