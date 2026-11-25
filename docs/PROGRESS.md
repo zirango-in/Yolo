@@ -149,5 +149,14 @@ Read this first when starting a new session: it says exactly where we stopped.
 - VIP purchase history.
 - Tests: `test/vip_test.dart`; all 12 tests passing.
 
-## NEXT: Step 11 — Rankings & leaderboards
-Global, user, game, voice room, gift, family rankings; popular users / rooms; weekly; event ranking.
+## Step 11 done — Rankings & leaderboards
+- Rankings hub (Home trophy button, Discover banner / "Ranking" links): tabs Wealth (top gift senders),
+  Charm (top receivers), Rooms, Families, Popular users, Games (live when games launch), Events.
+- Daily / Weekly / Monthly, Global / Friends filter, animated top-3 podium, list, pinned "My position"
+  with the gap to the next rank. Tap a row → user profile / room (password check) / family profile.
+- Uses real gift records and family activeness; demo numbers otherwise. Laravel: GET /rankings/{type}?period=&scope=
+- Tests: `test/rankings_test.dart`; all 13 tests passing.
+
+## NEXT: Step 12 — Events & missions
+Events home, current / upcoming, details, rules, daily & weekly missions, new user tasks,
+check-in rewards, event leaderboard, event gifts, claim rewards, achievements.

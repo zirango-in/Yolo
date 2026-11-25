@@ -66,7 +66,20 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             ),
           ),
         ],
-        SectionTitle(q.isEmpty ? 'Popular users' : 'Users'),
+        if (q.isEmpty)
+          GlassCard(
+            margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            gradient: const LinearGradient(colors: [Color(0xFF4A3410), Color(0xFF2A1A05)]),
+            border: YoloColors.gold.withValues(alpha: 0.4),
+            onTap: () => context.push('/rankings'),
+            child: const Row(children: [
+              Icon(Icons.emoji_events_rounded, color: YoloColors.gold, size: 32),
+              SizedBox(width: 12),
+              Expanded(child: Text('Rankings: top gifters, stars, rooms and families', style: TextStyle(fontWeight: FontWeight.w700))),
+              Icon(Icons.chevron_right_rounded, color: YoloColors.gold),
+            ]),
+          ),
+        SectionTitle(q.isEmpty ? 'Popular users' : 'Users', action: q.isEmpty ? 'Ranking' : null, onAction: () => context.push('/rankings', extra: 4)),
         if (users.isEmpty) const Padding(padding: EdgeInsets.all(20), child: Text('No users found', style: TextStyle(color: YoloColors.textMuted))),
         for (final (i, u) in users.indexed)
           ListTile(
@@ -83,7 +96,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               child: Text(following.contains(u.id) ? 'Following' : 'Follow'),
             ),
           ).entrance(i),
-        SectionTitle(q.isEmpty ? 'Popular rooms' : 'Rooms'),
+        SectionTitle(q.isEmpty ? 'Popular rooms' : 'Rooms', action: q.isEmpty ? 'Ranking' : null, onAction: () => context.push('/rankings', extra: 2)),
         for (final (i, r) in filteredRooms.indexed)
           ListTile(
             onTap: () => openRoom(context, ref, r),

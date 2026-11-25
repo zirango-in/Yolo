@@ -95,8 +95,8 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Monthly Subscription · Subscription Management · VIP Purchase History
 
 ## Step 11 — Rankings & Leaderboards
-- [ ] Global · User · Game · Voice Room · Gift · Family
-- [ ] Popular Users · Popular Rooms · Weekly · Event
+- [x] Global · User · Game · Voice Room · Gift · Family
+- [x] Popular Users · Popular Rooms · Weekly · Event
 
 ## Step 12 — Events & Missions
 - [ ] Events Home · Current · Upcoming · Details · Rules

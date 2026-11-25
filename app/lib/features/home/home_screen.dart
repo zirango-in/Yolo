@@ -162,6 +162,8 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
                     ),
                     Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: CoinPill(coins: me?.coins ?? 0, onTap: () => context.push('/wallet')))),
                     const SizedBox(width: 10),
+                    GlassIconButton(icon: Icons.emoji_events_rounded, label: 'Rankings', onTap: () => context.push('/rankings')),
+                    const SizedBox(width: 8),
                     GlassIconButton(icon: Icons.search_rounded, label: 'Search', onTap: () => context.push('/discover')),
                     const SizedBox(width: 10),
                     GlassIconButton(icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () => context.push('/notifications')),
