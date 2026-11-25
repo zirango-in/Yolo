@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/theme.dart';
 import '../../data/models.dart';
 import '../../data/events_providers.dart';
+import '../../data/notifications_providers.dart';
 import '../../data/providers.dart';
 import '../../widgets/common.dart';
 import '../games/game_center_screen.dart';
@@ -46,13 +47,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 }
 
-class _BottomBar extends StatelessWidget {
+class _BottomBar extends ConsumerWidget {
   const _BottomBar({required this.index, required this.onTap});
   final int index;
   final ValueChanged<int> onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadNotificationsProvider);
     Widget item(int i, IconData icon, String label) {
       final active = i == index;
       return Expanded(
@@ -62,7 +64,11 @@ class _BottomBar extends StatelessWidget {
             AnimatedScale(
               scale: active ? 1.12 : 1,
               duration: 200.ms,
-              child: Icon(icon, color: active ? YoloColors.gold : YoloColors.textMuted),
+              child: Badge(
+                isLabelVisible: i == 3 && unread > 0,
+                label: Text('$unread'),
+                child: Icon(icon, color: active ? YoloColors.gold : YoloColors.textMuted),
+              ),
             ),
             const SizedBox(height: 4),
             Text(label,
@@ -167,7 +173,11 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
                     const SizedBox(width: 8),
                     GlassIconButton(icon: Icons.search_rounded, label: 'Search', onTap: () => context.push('/discover')),
                     const SizedBox(width: 10),
-                    GlassIconButton(icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () => context.push('/notifications')),
+                    Badge(
+                      isLabelVisible: ref.watch(unreadNotificationsProvider) > 0,
+                      label: Text('${ref.watch(unreadNotificationsProvider)}'),
+                      child: GlassIconButton(icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () => context.push('/notifications')),
+                    ),
                   ]),
                 ),
               ),

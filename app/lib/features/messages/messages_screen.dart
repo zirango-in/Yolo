@@ -11,6 +11,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/theme.dart';
 import '../../data/demo_content.dart';
 import '../../data/models.dart';
+import '../../data/notifications_providers.dart';
 import '../../data/social_providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/page_kit.dart';
@@ -22,11 +23,10 @@ class MessagesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final read = ref.watch(readNotificationsProvider);
     final blocked = ref.watch(blockedProvider);
     final requests = ref.watch(incomingRequestsProvider);
     final groups = ref.watch(groupsProvider);
-    final unreadNotes = [for (final (i, n) in demoNotifications.indexed) if (n.unread && !read.contains(i)) i].length;
+    final unreadNotes = ref.watch(unreadNotificationsProvider);
     final convos = demoConversations.where((c) => !blocked.contains(c.user.id)).toList();
 
     Widget shortcut(IconData icon, String label, Color color, String route, {int badge = 0}) => Expanded(

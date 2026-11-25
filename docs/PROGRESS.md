@@ -167,6 +167,16 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Home "Ludo Party Night" banner opens the live event. Data in `lib/data/events_providers.dart`.
 - Tests: `test/events_test.dart`; all 14 tests passing.
 
-## NEXT: Step 13 — Notifications
-All, friend requests, new messages, gift, room invitations, game invitations, family, system, event,
-reward notifications — with actions (accept, join room, open chat, claim).
+## Step 13 done — Notifications
+- Notification center with 9 types and tabs (All, Friends, Messages, Gifts, Invites, Family, Events, Rewards, System).
+- Unread count in the title, red dots, badge on the Home bell and on the Messages tab.
+- Actions: Accept / decline friend, Reply (opens chat), Say thanks for a gift (sends chat message),
+  Join room (password check), Open family, View event, Claim reward (coins), Read system notice; game invites "Soon".
+- Tap marks read, swipe left deletes, menu: mark all as read, clear all, settings (Step 14).
+- GoldButton labels now shrink to fit (narrow buttons / large accessibility fonts).
+- Data in `lib/data/notifications_providers.dart`; push delivery (FCM) comes with the Laravel backend.
+- Tests: `test/notifications_test.dart`; all 15 tests passing.
+
+## NEXT: Step 14 — Settings
+Settings home, account, privacy, notifications, sound, language, theme, blocked users,
+permissions (mic, camera, gallery, location), cache / storage, logout.

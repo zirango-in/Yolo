@@ -104,8 +104,8 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Event Leaderboard · Event Gifts · Claim Rewards · Achievements
 
 ## Step 13 — Notifications
-- [ ] All · Friend Requests · Messages · Gifts · Room Invites · Game Invites
-- [ ] Family · System · Events · Rewards
+- [x] All · Friend Requests · Messages · Gifts · Room Invites · Game Invites
+- [x] Family · System · Events · Rewards
 
 ## Step 14 — Settings
 - [ ] Settings Home · Account · Privacy · Notifications · Sound · Language · Theme

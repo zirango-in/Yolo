@@ -175,8 +175,14 @@ class _GoldButtonState extends State<GoldButton> {
                 ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: YoloColors.onGold))
                 : Row(mainAxisSize: MainAxisSize.min, children: [
                     if (widget.icon != null) ...[Icon(widget.icon, color: YoloColors.onGold, size: 20), const SizedBox(width: 10)],
-                    Text(widget.label,
-                        style: const TextStyle(color: YoloColors.onGold, fontWeight: FontWeight.w800, fontSize: 16)),
+                    // Shrinks to fit narrow buttons and large accessibility fonts.
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(widget.label,
+                            maxLines: 1, style: const TextStyle(color: YoloColors.onGold, fontWeight: FontWeight.w800, fontSize: 16)),
+                      ),
+                    ),
                   ]),
           ),
         ),

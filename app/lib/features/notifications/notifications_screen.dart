@@ -1,10 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
-import '../../data/demo_content.dart';
+import '../../data/events_providers.dart';
+import '../../data/notifications_providers.dart';
+import '../../data/providers.dart';
 import '../../data/social_providers.dart';
+import '../../widgets/common.dart';
 import '../../widgets/page_kit.dart';
+import '../room/room_sheets.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -14,14 +19,17 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  static const _tabs = ['All', 'Friends', 'Gifts', 'Invites', 'Family', 'System'];
+  static const _tabs = ['All', 'Friends', 'Messages', 'Gifts', 'Invites', 'Family', 'Events', 'Rewards', 'System'];
   static const _filters = <List<String>>[
     [],
-    ['friend', 'message'],
-    ['gift', 'reward'],
+    ['friend'],
+    ['message'],
+    ['gift'],
     ['room', 'game'],
     ['family'],
-    ['system', 'event'],
+    ['event'],
+    ['reward'],
+    ['system'],
   ];
   int _tab = 0;
 
@@ -37,44 +45,145 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     'reward': (Icons.redeem_rounded, Color(0xFFFDE68A)),
   };
 
+  NotificationsController get _ctrl => ref.read(notificationsProvider.notifier);
+
+  Future<void> _action(AppNotification n) async {
+    _ctrl.markRead(n.id);
+    switch (n.type) {
+      case 'friend':
+        acceptRequest(ref, n.ref);
+        _ctrl.markDone(n.id);
+        showYoloToast(context, 'You are now friends with ${userById(n.ref).name}');
+      case 'message':
+        context.push('/chat', extra: userById(n.ref));
+      case 'gift':
+        ref.read(chatProvider('u:${n.ref}').notifier).send('Thank you for the gift!');
+        _ctrl.markDone(n.id);
+        showYoloToast(context, 'Thank-you sent to ${userById(n.ref).name}');
+      case 'room':
+        final rooms = await ref.read(roomsProvider('popular').future);
+        final room = rooms.where((r) => r.id == n.ref).firstOrNull;
+        if (room != null && mounted) await openRoom(context, ref, room);
+      case 'game':
+        showYoloToast(context, 'Games are coming soon');
+      case 'family':
+        context.push('/family');
+      case 'event':
+        final e = allEvents.where((e) => e.id == n.ref).firstOrNull;
+        if (e != null) context.push('/events/detail', extra: e);
+      case 'reward':
+        if (_ctrl.claim(n)) showYoloToast(context, '+${n.ref} coins');
+      default:
+        showDialog<void>(
+          context: context,
+          builder: (c) => AlertDialog(
+            backgroundColor: YoloColors.sheet,
+            title: Text(n.title),
+            content: Text(n.body),
+            actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+          ),
+        );
+    }
+  }
+
+  String? _actionLabel(AppNotification n) => switch (n.type) {
+        'friend' => n.done ? null : 'Accept',
+        'message' => 'Reply',
+        'gift' => n.done ? null : 'Say thanks',
+        'room' => 'Join',
+        'game' => 'Soon',
+        'family' => 'Open',
+        'event' => 'View',
+        'reward' => n.done ? null : 'Claim',
+        _ => 'Read',
+      };
+
+  String? _doneLabel(AppNotification n) => switch (n.type) {
+        'friend' => 'Accepted',
+        'gift' => 'Thanked',
+        'reward' => 'Claimed',
+        _ => null,
+      };
+
   @override
   Widget build(BuildContext context) {
-    final read = ref.watch(readNotificationsProvider);
-    final entries = [
-      for (final (i, n) in demoNotifications.indexed)
-        if (_filters[_tab].isEmpty || _filters[_tab].contains(n.type)) (i, n),
-    ];
+    final all = ref.watch(notificationsProvider);
+    final list = all.where((n) => _filters[_tab].isEmpty || _filters[_tab].contains(n.type)).toList();
+    final unread = all.where((n) => !n.read).length;
 
     return YoloPage(
-      title: 'Notifications',
+      title: unread > 0 ? 'Notifications ($unread)' : 'Notifications',
       actions: [
-        TextButton(
-          onPressed: () => ref.read(readNotificationsProvider.notifier).addAll(List.generate(demoNotifications.length, (i) => i)),
-          child: const Text('Read all', style: TextStyle(color: YoloColors.gold)),
+        PopupMenuButton<String>(
+          tooltip: 'Notification options',
+          onSelected: (v) {
+            if (v == 'read') _ctrl.markAllRead();
+            if (v == 'clear') _ctrl.clearAll();
+            if (v == 'settings') showYoloToast(context, 'Notification settings arrive in Step 14');
+          },
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'read', child: Text('Mark all as read')),
+            PopupMenuItem(value: 'clear', child: Text('Clear all')),
+            PopupMenuItem(value: 'settings', child: Text('Notification settings')),
+          ],
         ),
       ],
       bottom: YoloTabs(tabs: _tabs, index: _tab, onChanged: (i) => setState(() => _tab = i)),
-      body: entries.isEmpty
-          ? const EmptyState(icon: Icons.notifications_none_rounded, title: 'All caught up')
+      body: list.isEmpty
+          ? const EmptyState(icon: Icons.notifications_none_rounded, title: 'All caught up', subtitle: 'New notifications will show up here.')
           : ListView.builder(
-              itemCount: entries.length,
+              itemCount: list.length,
               itemBuilder: (_, k) {
-                final (i, n) = entries[k];
-                final unread = n.unread && !read.contains(i);
+                final n = list[k];
                 final (icon, color) = _style[n.type]!;
-                return ListTile(
-                  onTap: () => ref.read(readNotificationsProvider.notifier).add(i),
-                  tileColor: unread ? YoloColors.gold.withValues(alpha: 0.05) : null,
-                  leading: TintIcon(icon, color: color, size: 46),
-                  title: Text(n.title, style: TextStyle(fontWeight: unread ? FontWeight.w800 : FontWeight.w600)),
-                  subtitle: Text(n.body, style: const TextStyle(color: YoloColors.textMuted)),
-                  trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                    Text(n.time, style: const TextStyle(fontSize: 11, color: YoloColors.textMuted)),
-                    if (unread) ...[
-                      const SizedBox(height: 6),
-                      Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle)),
-                    ],
-                  ]),
+                final label = _actionLabel(n);
+                return Dismissible(
+                  key: ValueKey('n${n.id}'),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    color: const Color(0xFFDC2626),
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 24),
+                    child: const Icon(Icons.delete_rounded, color: Colors.white),
+                  ),
+                  onDismissed: (_) {
+                    _ctrl.delete(n.id);
+                    showYoloToast(context, 'Notification deleted');
+                  },
+                  child: ListTile(
+                    onTap: () => _ctrl.markRead(n.id),
+                    tileColor: n.read ? null : YoloColors.gold.withValues(alpha: 0.05),
+                    leading: Badge(
+                      isLabelVisible: !n.read,
+                      smallSize: 10,
+                      backgroundColor: const Color(0xFFEF4444),
+                      child: n.ref > 2000 && n.ref < 3000 && n.type != 'reward'
+                          ? YoloAvatar(user: userById(n.ref), size: 46)
+                          : TintIcon(icon, color: color, size: 46),
+                    ),
+                    title: Text(n.title, style: TextStyle(fontWeight: n.read ? FontWeight.w600 : FontWeight.w800)),
+                    subtitle: Text('${n.body} · ${n.time}', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: YoloColors.textMuted)),
+                    trailing: label == null
+                        ? Text(_doneLabel(n) ?? '', style: const TextStyle(color: YoloColors.online, fontWeight: FontWeight.w700))
+                        : Row(mainAxisSize: MainAxisSize.min, children: [
+                            if (n.type == 'friend')
+                              IconButton(
+                                tooltip: 'Decline',
+                                icon: const Icon(Icons.close_rounded, color: YoloColors.textMuted),
+                                onPressed: () {
+                                  ref.read(incomingRequestsProvider.notifier).remove(n.ref);
+                                  _ctrl.delete(n.id);
+                                },
+                              ),
+                            SizedBox(
+                              width: 84,
+                              child: Opacity(
+                                opacity: n.type == 'game' ? 0.5 : 1,
+                                child: GoldButton(label: label, height: 34, onPressed: () => _action(n)),
+                              ),
+                            ),
+                          ]),
+                  ),
                 ).entrance(k);
               },
             ),

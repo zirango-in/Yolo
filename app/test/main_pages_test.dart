@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'package:yolo/data/notifications_providers.dart';
 import 'package:yolo/data/providers.dart';
 import 'package:yolo/data/social_providers.dart';
 import 'package:yolo/main.dart';
@@ -37,7 +38,7 @@ void main() {
     Future<void> open(String route, String title) async {
       router.push(route);
       await settle(tester);
-      expect(find.text(title), findsWidgets, reason: route);
+      expect(find.textContaining(title), findsWidgets, reason: route);
     }
 
     Future<void> back() async {
@@ -86,9 +87,11 @@ void main() {
 
     // Notifications: read all.
     await open('/notifications', 'Notifications');
-    await tester.tap(find.text('Read all'));
+    await tester.tap(find.byTooltip('Notification options'));
     await settle(tester);
-    expect(container.read(readNotificationsProvider).length, greaterThan(0));
+    await tester.tap(find.text('Mark all as read'));
+    await settle(tester);
+    expect(container.read(unreadNotificationsProvider), 0);
     await back();
 
     // Friends, events, settings, game center open.
