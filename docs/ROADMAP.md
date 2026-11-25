@@ -99,9 +99,9 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Popular Users · Popular Rooms · Weekly · Event
 
 ## Step 12 — Events & Missions
-- [ ] Events Home · Current · Upcoming · Details · Rules
-- [ ] Daily Missions · Weekly Missions · New User Tasks · Check-in Rewards
-- [ ] Event Leaderboard · Event Gifts · Claim Rewards · Achievements
+- [x] Events Home · Current · Upcoming · Details · Rules
+- [x] Daily Missions · Weekly Missions · New User Tasks · Check-in Rewards
+- [x] Event Leaderboard · Event Gifts · Claim Rewards · Achievements
 
 ## Step 13 — Notifications
 - [ ] All · Friend Requests · Messages · Gifts · Room Invites · Game Invites

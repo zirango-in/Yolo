@@ -157,6 +157,16 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Uses real gift records and family activeness; demo numbers otherwise. Laravel: GET /rankings/{type}?period=&scope=
 - Tests: `test/rankings_test.dart`; all 13 tests passing.
 
-## NEXT: Step 12 — Events & missions
-Events home, current / upcoming, details, rules, daily & weekly missions, new user tasks,
-check-in rewards, event leaderboard, event gifts, claim rewards, achievements.
+## Step 12 done — Events & missions
+- Events home: live-event banner carousel with live countdowns, shortcuts (Missions, Check-in, Achievements,
+  Rankings), Current / Upcoming / Ended tabs with Joined + reminder markers.
+- Event details: big countdown, Join (live) / Remind me (upcoming), my points + rank, rules, milestone rewards
+  (claim when points reached), event gifts (count as points), event leaderboard.
+- Event points come automatically from gifts sent (GiftCenter → EventsController.onGiftSent).
+- Missions: Daily (shared with Rewards), Weekly, New user — progress, claim coins, reset countdown.
+- Home "Ludo Party Night" banner opens the live event. Data in `lib/data/events_providers.dart`.
+- Tests: `test/events_test.dart`; all 14 tests passing.
+
+## NEXT: Step 13 — Notifications
+All, friend requests, new messages, gift, room invitations, game invitations, family, system, event,
+reward notifications — with actions (accept, join room, open chat, claim).

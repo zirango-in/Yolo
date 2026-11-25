@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
 import '../../data/models.dart';
+import '../../data/events_providers.dart';
 import '../../data/providers.dart';
 import '../../widgets/common.dart';
 import '../games/game_center_screen.dart';
@@ -310,7 +311,7 @@ class _EventBanner extends StatelessWidget {
                 Text('Play with your room and win coins', style: TextStyle(fontSize: 13, color: Color(0xFFF1E6FF))),
               ]),
             ),
-            GoldButton(label: 'Join', height: 40, onPressed: () {}),
+            GoldButton(label: 'Join', height: 40, onPressed: () => context.push('/events/detail', extra: allEvents.first)),
           ]),
         ).animate(onPlay: (c) => c.repeat()).shimmer(delay: 3.seconds, duration: 1500.ms, color: Colors.white24),
       );

@@ -95,11 +95,10 @@ void main() {
     await open('/friends', 'Friends');
     await back();
     await open('/events', 'Events');
-    await tester.tap(find.text('Ludo Party Night'));
+    await tester.tap(find.text('Ludo Party Night').first);
     await settle(tester);
     expect(find.text('Rules'), findsOneWidget);
-    await tester.tap(find.text('Join now'));
-    await settle(tester);
+    await back();
     await back();
     await open('/settings', 'Settings');
     await back();

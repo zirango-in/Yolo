@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'core/theme.dart';
 import 'data/models.dart';
+import 'data/events_providers.dart';
 import 'data/providers.dart';
 import 'data/social_providers.dart';
 import 'features/account/account_screen.dart';
@@ -104,6 +105,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/family/members', builder: (_, _) => const FamilyMembersScreen()),
       GoRoute(path: '/family/ranking', builder: (_, _) => const FamilyRankingScreen()),
       GoRoute(path: '/events', builder: (_, _) => const EventsScreen()),
+      GoRoute(path: '/events/detail', builder: (_, state) => EventDetailScreen(event: state.extra! as EventInfo)),
+      GoRoute(path: '/missions', builder: (_, _) => const MissionsScreen()),
       GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
       GoRoute(path: '/gifts', builder: (_, _) => const GiftStoreScreen()),
       GoRoute(path: '/gifts/history', builder: (_, _) => const GiftHistoryScreen()),
