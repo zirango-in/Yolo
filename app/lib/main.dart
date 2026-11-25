@@ -16,7 +16,9 @@ import 'features/auth/phone_flow.dart';
 import 'features/auth/register_screen.dart';
 import 'features/auth/welcome_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/cp/cp_pages.dart';
 import 'features/discover/discover_screen.dart';
+import 'data/cp_providers.dart';
 import 'features/events/events_screen.dart';
 import 'features/family/family_pages.dart';
 import 'features/family/family_screen.dart';
@@ -88,6 +90,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/room/settings', builder: (_, state) => RoomSettingsScreen(room: state.extra! as Room)),
       GoRoute(path: '/room/level', builder: (_, state) => RoomLevelScreen(room: state.extra! as Room)),
       GoRoute(path: '/rankings', builder: (_, state) => RankingsScreen(initialTab: state.extra as int? ?? 0)),
+      GoRoute(path: '/cp', builder: (_, _) => const RelationshipsScreen()),
+      GoRoute(path: '/cp/space', builder: (_, state) => CpSpaceScreen(relationId: (state.extra! as Relationship).id)),
+      GoRoute(path: '/cp/ranking', builder: (_, _) => const CpRankingScreen()),
       GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen()),
       GoRoute(path: '/games', builder: (_, _) => const GameCenterScreen()),
       GoRoute(path: '/friends', builder: (_, _) => const FriendsScreen()),

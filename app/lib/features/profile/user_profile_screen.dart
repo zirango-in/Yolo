@@ -9,6 +9,8 @@ import '../../data/profile_providers.dart';
 import '../../data/social_providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/page_kit.dart';
+import '../../data/cp_providers.dart';
+import '../cp/cp_pages.dart';
 import '../gifts/gift_pages.dart';
 import '../room/room_sheets.dart';
 
@@ -127,6 +129,23 @@ class UserProfileScreen extends ConsumerWidget {
             ),
           ]),
         ),
+        Builder(builder: (_) {
+          ref.watch(cpProvider);
+          final partner = ref.read(cpProvider.notifier).coupleOf(user.id);
+          return GlassCard(
+            margin: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+            padding: const EdgeInsets.all(12),
+            gradient: const LinearGradient(colors: [Color(0xFF9D174D), Color(0xFF4C1D95)]),
+            child: Row(children: [
+              const Icon(Icons.favorite_rounded, color: Color(0xFFF472B6)),
+              const SizedBox(width: 10),
+              Expanded(child: Text(partner == null ? '${user.name} has no CP yet' : 'CP: ${partner.name}', style: const TextStyle(fontWeight: FontWeight.w800))),
+              if (partner != null) YoloAvatar(user: partner, size: 34),
+              if (!ref.read(cpProvider).hasRelationWith(user.id))
+                TextButton(onPressed: () => showSendRelationSheet(context, ref, to: user), child: const Text('Request', style: TextStyle(color: YoloColors.goldLight))),
+            ]),
+          );
+        }),
         const SectionTitle('Badges'),
         SizedBox(
           height: 56,

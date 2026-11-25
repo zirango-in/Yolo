@@ -256,3 +256,15 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Entry banner pill + now-playing music pill.
 - Layout audit extended to all new room screens: 0 overflows (360×640 and 390×844, text ×1.1 and ×1.3).
 - Tests: rewritten `test/voice_room_test.dart` covers all of the above; all 20 tests passing.
+
+## CP & relationships
+- Types & slots: Couple ×1 (Ring gift), Best friend ×2 (Crown), Brother ×2 (Diamond), Sister ×2 (Diamond).
+- Requests: send with the gift (coins spent, gift recorded) → pending → demo partner accepts after 3 s +
+  notification; incoming requests accept / decline (also from Notifications); cancel sent; slot limits.
+- CP levels 1–6 by intimacy (0 / 520 / 1,314 / 5,200 / 13,140 / 52,000) with rewards; intimacy grows
+  automatically from gifts between partners (10 coins = 1 point).
+- Pages: `/cp` (couple card or "Find your CP", slots per type, requests), `/cp/space` (pair avatars with beating
+  heart, days together, level, intimacy bar, rewards, gifts between you, send gift, end relationship),
+  `/cp/ranking` (top pairs).
+- Shown on: my profile (CP card), other profiles (their CP + Request button), room user card (real CP partner).
+- Data in `lib/data/cp_providers.dart`. Tests: `test/cp_test.dart`; all 21 tests passing; layout audit clean.

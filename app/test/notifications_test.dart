@@ -34,18 +34,22 @@ void main() {
     await settle(tester);
 
     // Unread badge on the Home bell
-    expect(c.read(unreadNotificationsProvider), 6);
-    expect(find.text('6'), findsWidgets);
+    expect(c.read(unreadNotificationsProvider), 7);
+    expect(find.text('7'), findsWidgets);
 
     await tester.tap(find.bySemanticsLabel('Notifications'));
     await settle(tester);
-    expect(find.text('Notifications (6)'), findsOneWidget);
+    expect(find.text('Notifications (7)'), findsOneWidget);
 
     // Accept the friend request
-    await tester.tap(find.text('Accept'));
+    // Two Accept buttons: friend request first, then the CP request.
+    await tester.tap(find.text('Accept').first);
     await settle(tester);
     expect(c.read(friendsProvider).any((u) => u.id == 2005), isTrue);
     expect(find.text('Accepted'), findsOneWidget);
+    await tester.tap(find.text('Accept'));
+    await settle(tester);
+    expect(find.text('Accepted'), findsNWidgets(2));
 
     // Thank for the gift
     await tester.tap(find.text('Say thanks'));

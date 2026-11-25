@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
+import '../../data/cp_providers.dart';
 import '../../data/events_providers.dart';
 import '../../data/notifications_providers.dart';
 import '../../data/providers.dart';
@@ -22,7 +23,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   static const _tabs = ['All', 'Friends', 'Messages', 'Gifts', 'Invites', 'Family', 'Events', 'Rewards', 'System'];
   static const _filters = <List<String>>[
     [],
-    ['friend'],
+    ['friend', 'cp'],
     ['message'],
     ['gift'],
     ['room', 'game'],
@@ -35,6 +36,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   static const _style = {
     'friend': (Icons.person_add_rounded, Color(0xFF7DD3FC)),
+    'cp': (Icons.favorite_rounded, Color(0xFFF472B6)),
     'message': (Icons.chat_rounded, Color(0xFF86EFAC)),
     'gift': (Icons.card_giftcard_rounded, Color(0xFFF5C451)),
     'room': (Icons.mic_rounded, Color(0xFFF9A8D4)),
@@ -54,6 +56,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         acceptRequest(ref, n.ref);
         _ctrl.markDone(n.id);
         showYoloToast(context, 'You are now friends with ${userById(n.ref).name}');
+      case 'cp':
+        final req = ref.read(cpProvider).requests.where((r) => r.incoming && r.user.id == n.ref).firstOrNull;
+        if (req == null) {
+          context.push('/cp');
+        } else {
+          final err = ref.read(cpProvider.notifier).accept(req.id);
+          if (err.isEmpty) _ctrl.markDone(n.id);
+          showYoloToast(context, err.isEmpty ? 'You are now ${relationType(req.type).name} with ${req.user.name}!' : err);
+        }
       case 'message':
         context.push('/chat', extra: userById(n.ref));
       case 'gift':
@@ -88,6 +99,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   String? _actionLabel(AppNotification n) => switch (n.type) {
         'friend' => n.done ? null : 'Accept',
+        'cp' => n.done ? null : (ref.read(cpProvider).requests.any((r) => r.incoming && r.user.id == n.ref) ? 'Accept' : 'View'),
         'message' => 'Reply',
         'gift' => n.done ? null : 'Say thanks',
         'room' => 'Join',
@@ -99,7 +111,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       };
 
   String? _doneLabel(AppNotification n) => switch (n.type) {
-        'friend' => 'Accepted',
+        'friend' || 'cp' => 'Accepted',
         'gift' => 'Thanked',
         'reward' => 'Claimed',
         _ => null,

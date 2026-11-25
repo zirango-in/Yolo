@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'package:yolo/data/cp_providers.dart';
 import 'package:yolo/data/demo_content.dart';
 import 'package:yolo/data/events_providers.dart';
 import 'package:yolo/data/music_providers.dart';
@@ -143,12 +144,13 @@ void main() {
         ('/support/report', null), ('/support/tickets', null), ('/legal/privacy', null),
         ('/music', null), ('/music/karaoke', demoSongs.first), ('/music/room', null), ('/music/micgrab', null),
         ('/music/upload', null), ('/music/result', SingResult(demoSongs.first, 92, 100, '20:00')),
-        ('/room/create', null),
+        ('/room/create', null), ('/cp', null), ('/cp/ranking', null),
       ];
       for (final (r, extra) in routes) {
         await visit(r, extra: extra);
       }
 
+      await visit('/cp/space', extra: c.read(cpProvider).relations.first);
       // Family member view (join first)
       await visit('/family/profile', extra: demoFamilies[2], scroll: false);
       await tester.tap(find.text('Join family'), warnIfMissed: false);

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
+import '../../data/cp_providers.dart';
 import '../../data/moments_providers.dart';
 import '../../data/profile_providers.dart';
 import '../../data/providers.dart';
@@ -166,6 +167,38 @@ class ProfileScreen extends ConsumerWidget {
             Icon(Icons.chevron_right_rounded, color: YoloColors.gold),
           ]),
         ).animate(onPlay: (c) => c.repeat()).shimmer(delay: 2.seconds, duration: 1500.ms, color: const Color(0x33FFE9A8)),
+        SectionTitle('CP & relationships', action: 'All', onAction: () => context.push('/cp')),
+        Builder(builder: (_) {
+          final cp = ref.watch(cpProvider);
+          final couple = cp.couple;
+          return GlassCard(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(14),
+            gradient: const LinearGradient(colors: [Color(0xFF9D174D), Color(0xFF4C1D95)]),
+            onTap: () => couple == null ? context.push('/cp') : context.push('/cp/space', extra: couple),
+            child: Row(children: [
+              if (couple != null) ...[
+                YoloAvatar(user: couple.partner, size: 44, goldFrame: true),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('CP · ${couple.partner.name}', style: const TextStyle(fontWeight: FontWeight.w800)),
+                    Text('${couple.days} days · Lv${cpLevel(couple.intimacy)}', style: const TextStyle(fontSize: 12, color: Color(0xFFFCE7F3))),
+                  ]),
+                ),
+              ] else
+                const Expanded(
+                  child: Row(children: [
+                    Icon(Icons.favorite_border_rounded, color: Color(0xFFFBCFE8), size: 32),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('Find your CP', style: TextStyle(fontWeight: FontWeight.w800))),
+                  ]),
+                ),
+              Text('${cp.relations.length} relationships', style: const TextStyle(fontSize: 12, color: Color(0xFFFCE7F3))),
+              const Icon(Icons.chevron_right_rounded),
+            ]),
+          );
+        }),
         SectionTitle('Badges', action: 'All', onAction: () => context.push('/profile/badges')),
         SizedBox(
           height: 64,

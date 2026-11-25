@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'cp_providers.dart';
 import 'events_providers.dart';
 import 'models.dart';
 import 'providers.dart';
@@ -74,6 +75,7 @@ class GiftCenter extends Notifier<GiftCenterState> {
     }
     state = GiftCenterState(records: [GiftRecord(gift, me, to, qty, _now()), ...state.records], backpack: state.backpack);
     ref.read(eventsProvider.notifier).onGiftSent(gift, qty);
+    ref.read(cpProvider.notifier).onGift(to.id, gift.price * qty);
     return SendResult(true, win > 0 ? 'Lucky! You won $win coins back' : 'Sent ${gift.name} ×$qty to ${to.name}', luckyWin: win);
   }
 

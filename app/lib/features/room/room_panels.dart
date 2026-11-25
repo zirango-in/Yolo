@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
+import '../../data/cp_providers.dart';
 import '../../data/demo_content.dart';
 import '../../data/models.dart';
 import '../../data/profile_providers.dart';
@@ -468,7 +469,7 @@ void showUserCard(BuildContext context, WidgetRef ref, Room room, YoloUser u, {V
   final me = ref.read(sessionProvider);
   final role = ctrl.roleOf(u.id);
   final isMe = me?.id == u.id;
-  final cp = demoAllUsers.where((x) => x.id != u.id).elementAt(u.id % 4);
+  final cp = ref.read(cpProvider.notifier).coupleOf(u.id);
   final cfg = isMe
       ? ref.read(profileExtrasProvider).avatar
       : AvatarConfig(skin: u.id % 5, hair: 1 + u.id % 5, hairColor: u.id % 6, outfit: u.id % 4, outfitColor: (u.id ~/ 3) % 6, accessory: u.id % 6);
@@ -486,6 +487,7 @@ void showUserCard(BuildContext context, WidgetRef ref, Room room, YoloUser u, {V
           ),
           child: Stack(children: [
             Center(child: AvatarFigure(config: cfg, size: 130, background: const [Color(0x00000000), Color(0x00000000)]).animate().scale(curve: Curves.easeOutBack)),
+            if (cp != null)
             Positioned(
               right: 10,
               bottom: 12,

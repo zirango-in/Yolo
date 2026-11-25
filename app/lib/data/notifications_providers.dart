@@ -19,7 +19,7 @@ class AppNotification {
   AppNotification copyWith({bool? read, bool? done}) => AppNotification(id, type, title, body, time, ref: ref, read: read ?? this.read, done: done ?? this.done);
 }
 
-const notificationTypes = ['friend', 'message', 'gift', 'room', 'game', 'family', 'system', 'event', 'reward'];
+const notificationTypes = ['cp', 'friend', 'message', 'gift', 'room', 'game', 'family', 'system', 'event', 'reward'];
 
 final notificationsProvider = NotifierProvider<NotificationsController, List<AppNotification>>(NotificationsController.new);
 
@@ -27,6 +27,7 @@ class NotificationsController extends Notifier<List<AppNotification>> {
   @override
   List<AppNotification> build() => const [
         AppNotification(1, 'friend', 'New friend request', 'Leo wants to be your friend', '2m', ref: 2005),
+        AppNotification(10, 'cp', 'CP request', 'Leo wants to be your Couple', '3m', ref: 2005),
         AppNotification(2, 'message', 'New message', 'Zara: See you in the room tonight!', '4m', ref: 2001),
         AppNotification(3, 'gift', 'You received a gift', 'Zara sent you a Crown ×1', '10m', ref: 2001),
         AppNotification(4, 'room', 'Room invitation', 'Kenji invited you to "Sing With Me"', '25m', ref: 884217),
@@ -38,6 +39,12 @@ class NotificationsController extends Notifier<List<AppNotification>> {
       ];
 
   int get unread => state.where((n) => !n.read).length;
+
+  /// Add a new notification at the top.
+  void push(String type, String title, String body, {int ref = 0}) {
+    final id = state.fold<int>(0, (m, n) => n.id > m ? n.id : m) + 1;
+    state = [AppNotification(id, type, title, body, 'now', ref: ref), ...state];
+  }
 
   void markRead(int id) => state = [for (final n in state) n.id == id ? n.copyWith(read: true) : n];
   void markAllRead() => state = [for (final n in state) n.copyWith(read: true)];
