@@ -22,6 +22,11 @@ class SessionController extends Notifier<YoloUser?> {
 
   void loginAs(YoloUser user) => state = user;
 
+  void earn(int coins) {
+    final me = state;
+    if (me != null) state = me.copyWith(coins: me.coins + coins);
+  }
+
   void updateProfile({String? name, String? gender, int? age}) {
     final me = state;
     if (me != null) state = me.copyWith(name: name, gender: gender, age: age);

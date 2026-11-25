@@ -49,3 +49,16 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Laravel endpoints needed: /auth/otp/send, /auth/otp/verify, /auth/email/login, /auth/password/forgot,
   /auth/guest, /me/profile, /me/account/bindings, /me/lucky-id, DELETE /me.
 - Next: Step 3 (user profile pages).
+
+## Step 3 done — User profile
+- My profile (Me tab): chosen background, avatar in equipped frame, copyable Yolo ID, stats (tap → friends),
+  avatar studio + levels shortcuts, VIP card, badges row, achievements progress, my moments, menu.
+- Edit profile: photo (gallery / camera via image_picker, avatar, or color), nickname, bio, gender, birthday,
+  profile background (6 covers), avatar frame (from owned shop frames).
+- Avatar studio (layered 2D, drawn in code): skin tone, eyes, 6 hairstyles + colors, 4 outfits + colors,
+  accessories (glasses, shades, crown, headphones, cap), randomize. 3D can replace it later.
+- Levels page (user / wealth / charm with progress + level rewards), Badges and Achievements (claim coin rewards).
+- Other user profile: cover, relation (Friends / Follows you), mutual followers, follow back, message,
+  badges, gift wall, their moments, report / block.
+- Test `test/profile_test.dart`; all 5 tests passing.
+- Next: Step 4 (voice room features).

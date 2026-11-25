@@ -42,11 +42,11 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] Delete Account
 
 ## Step 3 — User Profile
-- [ ] My Profile · Other User Profile · Edit Profile · Profile Photo
-- [ ] Avatar Customization (layered 2D first; 3D later): Face · Hairstyle · Clothes / Outfit · Accessories
-- [ ] Avatar Frames · Profile Background
-- [ ] User Level · User ID · Badges · Achievements
-- [ ] User Posts / Moments · Follow / Friend info
+- [x] My Profile · Other User Profile · Edit Profile · Profile Photo
+- [x] Avatar Customization (layered 2D first; 3D later): Face · Hairstyle · Clothes / Outfit · Accessories
+- [x] Avatar Frames · Profile Background
+- [x] User Level · User ID · Badges · Achievements
+- [x] User Posts / Moments · Follow / Friend info
 
 ## Step 4 — Voice Rooms
 - [ ] Room List · Public Room · Private Room · Create Room · Join Room · Room Details

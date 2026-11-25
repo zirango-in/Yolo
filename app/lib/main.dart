@@ -21,6 +21,9 @@ import 'features/games/game_center_screen.dart';
 import 'features/messages/messages_screen.dart';
 import 'features/moments/moments_screen.dart';
 import 'features/notifications/notifications_screen.dart';
+import 'features/profile/avatar_studio_screen.dart';
+import 'features/profile/edit_profile_screen.dart';
+import 'features/profile/level_badges_screens.dart';
 import 'features/profile/user_profile_screen.dart';
 import 'features/room/room_screen.dart';
 import 'features/settings/settings_screen.dart';
@@ -58,6 +61,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login/email', builder: (_, _) => const EmailLoginScreen()),
       GoRoute(path: '/login/recover', builder: (_, _) => const RecoveryScreen()),
       GoRoute(path: '/account', builder: (_, _) => const AccountScreen()),
+      GoRoute(path: '/profile/edit', builder: (_, _) => const EditProfileScreen()),
+      GoRoute(path: '/profile/avatar', builder: (_, _) => const AvatarStudioScreen()),
+      GoRoute(path: '/profile/levels', builder: (_, _) => const LevelScreen()),
+      GoRoute(path: '/profile/badges', builder: (_, _) => const BadgesScreen()),
+      GoRoute(path: '/profile/achievements', builder: (_, _) => const BadgesScreen(initialTab: 1)),
       GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
       GoRoute(path: '/room', builder: (_, state) => RoomScreen(room: state.extra! as Room)),
       GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen()),
