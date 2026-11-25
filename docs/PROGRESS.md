@@ -62,3 +62,16 @@ Read this first when starting a new session: it says exactly where we stopped.
   badges, gift wall, their moments, report / block.
 - Test `test/profile_test.dart`; all 5 tests passing.
 - Next: Step 4 (voice room features).
+
+## Working agreement (owner's instructions — follow every session)
+- Build features step by step from `docs/ROADMAP.md`. Games come LAST (after all app features).
+- After each step: run tests → commit → push to `develop` → tell the owner → WAIT for the owner's go-ahead.
+- Push before running out of session budget; keep this file updated with what is done and what is next.
+- Backend will be PHP Laravel + MySQL; admin panel later. Keep the app's API layer matching `docs/FEATURES.md`.
+- Owner tests in Android Studio on a physical phone from `~/Documents/Yolo` (git clone of this repo, `git pull` to update).
+- Explain things simply; stop immediately when the owner says stop/wait.
+
+## NEXT: Step 4 — Voice room features
+Admin management, room settings (name, announcement, password, lock/unlock, background/theme),
+room music, members list, invite friends, room ranking, speaker controls, report room, family voice room,
+create room / private room flow.
