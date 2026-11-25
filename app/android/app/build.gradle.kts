@@ -5,6 +5,10 @@ plugins {
 }
 
 android {
+    // Android lint crashes on some plugins with compileSdk 37; skip the release-time lint check.
+    lint {
+        checkReleaseBuilds = false
+    }
     namespace = "com.yolo.yolo"
     // permission_handler needs API 37+ to compile against (min/target SDK unchanged).
     compileSdk = 37
