@@ -69,7 +69,9 @@ void main() {
     await tester.tap(find.text('Late Night Talks'));
     await settle(tester);
     expect(find.bySemanticsLabel('Send gift'), findsOneWidget);
-    await tester.tap(find.bySemanticsLabel('Back'));
+    await tester.tap(find.byTooltip('Room menu'));
+    await settle(tester);
+    await tester.tap(find.text('Exit'));
     await settle(tester);
     await tester.tap(find.text('Exit room'));
     await settle(tester);

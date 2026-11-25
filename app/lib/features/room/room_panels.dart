@@ -110,7 +110,8 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
       final lvl = levelForExp(st.exp);
       final next = nextLevel(lvl);
       final staff = <int>{room.owner.id, ...st.coOwners, ...st.admins}.toList();
-      final online = st.seats.where((s) => s.user != null).length + 2;
+      final online = st.onlineCount;
+      final isOwner = ctrl.roleOf(ref.read(sessionProvider)!.id) == 'Owner';
       return SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -149,7 +150,27 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
             ),
           ]),
           const SizedBox(height: 12),
-          Text(st.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+          Row(children: [
+            Expanded(child: Text(st.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900))),
+            // Follow / unfollow lives here (not on the main room screen).
+            if (!isOwner)
+              ctrl.isMember
+                  ? OutlinedButton.icon(
+                      onPressed: () {
+                        ctrl.leaveMembership();
+                        showYoloToast(context, 'Unfollowed ${st.name}');
+                      },
+                      icon: const Icon(Icons.check_rounded, size: 16),
+                      label: const Text('Following'),
+                      style: OutlinedButton.styleFrom(foregroundColor: YoloColors.textSoft, visualDensity: VisualDensity.compact),
+                    )
+                  : FilledButton.icon(
+                      onPressed: () => showYoloToast(context, ctrl.join()),
+                      icon: const Icon(Icons.add_rounded, size: 16),
+                      label: const Text('Follow'),
+                      style: FilledButton.styleFrom(backgroundColor: YoloColors.gold, foregroundColor: YoloColors.onGold, visualDensity: VisualDensity.compact),
+                    ),
+          ]),
           const SizedBox(height: 6),
           Row(children: [
             Badge2(st.tag, bg: const Color(0x337DD3FC), fg: const Color(0xFF7DD3FC)),
@@ -162,7 +183,7 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
                 showYoloToast(context, 'Room ID copied');
               },
               child: Row(children: [
-                Text('ID: ${room.id}', style: const TextStyle(color: YoloColors.textMuted)),
+                Text('Room ID: ${room.id}', style: const TextStyle(color: YoloColors.textMuted)),
                 const SizedBox(width: 4),
                 const Icon(Icons.copy_rounded, size: 14, color: YoloColors.textMuted),
               ]),
@@ -350,7 +371,8 @@ class _MembersSheetState extends ConsumerState<_MembersSheet> {
     final q = _q.trim().toLowerCase();
     bool match(YoloUser u) => q.isEmpty || u.name.toLowerCase().contains(q) || '${u.id}' == q;
 
-    final onlineUsers = <YoloUser>{widget.room.owner, me, ...st.seats.where((s) => s.user != null).map((s) => s.user!)}.where((u) => !st.banned.contains(u.id)).where(match).toList();
+    // People currently in the room (live: updates as users enter or leave).
+    final onlineUsers = [for (final id in st.onlineIds) if (!st.banned.contains(id)) roomUser(ref, id)].where(match).toList();
     final memberUsers = <YoloUser>{if (st.members.contains(me.id)) me, ...demoAllUsers.where((u) => st.members.contains(u.id))}.where(match).toList()
       ..sort((a, b) => ['Owner', 'Co-owner', 'Admin', 'Member'].indexOf(ctrl.roleOf(a.id)).compareTo(['Owner', 'Co-owner', 'Admin', 'Member'].indexOf(ctrl.roleOf(b.id))));
     const mult = [1, 5, 18];
@@ -377,7 +399,7 @@ class _MembersSheetState extends ConsumerState<_MembersSheet> {
       );
     }
 
-    final tabs = ['Online ${onlineUsers.length}', 'Members ${formatCoins(st.memberCount)}', 'Contribution'];
+    final tabs = ['Online ${compactCount(st.onlineCount)}', 'Members ${formatCoins(st.memberCount)}', 'Contribution'];
     return Column(children: [
       const SizedBox(height: 10),
       Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
@@ -428,7 +450,14 @@ class _MembersSheetState extends ConsumerState<_MembersSheet> {
         ),
       Expanded(
         child: switch (_tab) {
-          0 => ListView(children: [for (final u in onlineUsers) row(u)]),
+          0 => ListView(children: [
+              for (final u in onlineUsers) row(u),
+              if (st.listeners > 0 && q.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text('+ ${formatCoins(st.listeners)} more listening', textAlign: TextAlign.center, style: const TextStyle(color: YoloColors.textMuted)),
+                ),
+            ]),
           1 => ListView(children: [
               for (final u in memberUsers)
                 row(

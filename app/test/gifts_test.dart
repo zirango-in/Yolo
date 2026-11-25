@@ -90,7 +90,9 @@ void main() {
     expect(find.text('Needs VIP 7'), findsOneWidget);
     await tester.tapAt(const Offset(195, 60));
     await settle(tester, 30);
-    await tester.tap(find.bySemanticsLabel('Back'));
+    await tester.tap(find.byTooltip('Room menu'));
+    await settle(tester);
+    await tester.tap(find.text('Exit'));
     await settle(tester);
     await tester.tap(find.text('Exit room'));
     await settle(tester);

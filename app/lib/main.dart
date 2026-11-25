@@ -38,6 +38,7 @@ import 'features/profile/level_badges_screens.dart';
 import 'features/profile/user_profile_screen.dart';
 import 'features/rankings/rankings_screen.dart';
 import 'features/room/create_room_screen.dart';
+import 'features/room/floating_room.dart';
 import 'features/room/room_pages.dart';
 import 'features/room/room_screen.dart';
 import 'features/settings/settings_pages.dart';
@@ -175,7 +176,17 @@ class YoloApp extends ConsumerWidget {
         final s = ref.watch(settingsProvider);
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(s.textScale), disableAnimations: s.reduceMotion),
-          child: Directionality(textDirection: s.isRtl ? TextDirection.rtl : TextDirection.ltr, child: child!),
+          child: Directionality(
+            textDirection: s.isRtl ? TextDirection.rtl : TextDirection.ltr,
+            // The floating mini room sits above every page while a room is minimized.
+            child: Stack(children: [
+              child!,
+              FloatingRoomBubble(
+                onOpen: (room) => ref.read(routerProvider).push('/room', extra: room),
+                dialogContext: () => ref.read(routerProvider).routerDelegate.navigatorKey.currentContext,
+              ),
+            ]),
+          ),
         );
       },
     );

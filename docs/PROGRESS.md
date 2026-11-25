@@ -268,3 +268,15 @@ Read this first when starting a new session: it says exactly where we stopped.
   `/cp/ranking` (top pairs).
 - Shown on: my profile (CP card), other profiles (their CP + Request button), room user card (real CP partner).
 - Data in `lib/data/cp_providers.dart`. Tests: `test/cp_test.dart`; all 21 tests passing; layout audit clean.
+
+## Voice room refinement + floating mini room
+- Header: room image instead of Back (tap → room details), name, "Level N" chip, real "Room ID: …".
+- Top 3 gift senders (gold/silver/bronze rings, 1-2-3) from live room contributions; tap → Contribution list.
+- Live online count (people in the room + listeners), changes as users enter/leave; tap → Online list.
+- Follow/Following moved into the room details panel (hidden for the owner). Join button removed from the room screen.
+- Back / swipe / "Minimize" keeps the room session alive (seat, mic, chat, timers) and shows a draggable
+  floating mini room on every page (cover, name, live bars, On mic/Muted). Tap → same room, no reload.
+  Only "Exit room" (room menu or × on the mini room) leaves the seat and ends the session.
+- Cleanup: removed duplicate Treasure tool, placeholder Games tool and duplicate bottom "More" button.
+- Fixed: mini room × used a tooltip with no overlay (would crash); bubble sizes itself to the real window.
+- Tests: minimize/restore 3× keeps seat, mic and claimed treasure; explicit exit removes the mini room.

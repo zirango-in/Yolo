@@ -49,7 +49,11 @@ void main() {
     RoomState st() => c.read(roomProvider(room));
     expect(st().seats.length, 12);
     expect(find.text('Aria Night Club'), findsOneWidget);
-    expect(find.bySemanticsLabel('Join room'), findsNothing); // owner is already a member
+    // Header: room image, Room ID, Level text; no Follow button on the main screen
+    expect(find.text('Room ID: ${room.id}'), findsOneWidget);
+    expect(find.textContaining('Level '), findsWidgets);
+    expect(find.text('Follow'), findsNothing);
+    expect(find.bySemanticsLabel('Back'), findsNothing);
 
     // Owner: lock an empty seat; mute, make admin, remove Zara from mic
     await tester.tap(find.bySemanticsLabel('Take seat 8'));
@@ -199,11 +203,33 @@ void main() {
     await tester.tap(find.byTooltip('Close'));
     await settle(tester);
 
-    // Exit
-    await tester.tap(find.bySemanticsLabel('Back'));
+    // Minimize with system back: still seated, mini room appears; restore it several times
+    final seatedBefore = st().seats.indexWhere((x) => x.user?.id == c.read(sessionProvider)!.id);
+    final micBefore = st().micOn;
+    for (var i = 0; i < 3; i++) {
+      await tester.binding.handlePopRoute();
+      await settle(tester);
+      expect(find.bySemanticsLabel('Send gift'), findsNothing);
+      expect(c.read(activeRoomProvider)?.id, room.id);
+      expect(find.bySemanticsLabel('Return to ${st().name}'), findsOneWidget);
+      await tester.tap(find.bySemanticsLabel('Return to ${st().name}'));
+      await settle(tester);
+      expect(find.bySemanticsLabel('Send gift'), findsOneWidget);
+      expect(find.bySemanticsLabel('Return to ${st().name}'), findsNothing);
+      expect(st().seats.indexWhere((x) => x.user?.id == c.read(sessionProvider)!.id), seatedBefore);
+      expect(st().micOn, micBefore);
+      expect(st().claimedBoxes.contains(0), isTrue); // same session, nothing reloaded
+    }
+
+    // Exit explicitly from the room menu: session ends and the mini room goes away
+    await tester.tap(find.byTooltip('Room menu'));
+    await settle(tester);
+    await tester.tap(find.text('Exit'));
     await settle(tester);
     await tester.tap(find.text('Exit room'));
     await settle(tester);
+    expect(c.read(activeRoomProvider), isNull);
+    expect(find.bySemanticsLabel('Return to Aria Night Club'), findsNothing);
 
     // Private room (VIP Lounge, 1234) as a guest: join as member, take a seat
     await tester.scrollUntilVisible(find.text('VIP Lounge'), 300, scrollable: find.byType(Scrollable).first);
@@ -213,10 +239,14 @@ void main() {
     await tester.enterText(find.byKey(const Key('room-password')), '1234');
     await tester.tap(find.text('Enter'));
     await settle(tester, 40);
-    expect(find.bySemanticsLabel('Join room'), findsOneWidget);
-    await tester.tap(find.bySemanticsLabel('Join room'));
+    // Follow lives in the room details panel (tap the room name / image)
+    await tester.tap(find.bySemanticsLabel('Room details'));
     await settle(tester);
-    expect(find.bySemanticsLabel('Join room'), findsNothing);
+    await tester.tap(find.text('Follow'));
+    await settle(tester);
+    expect(find.text('Following'), findsOneWidget);
+    await tester.tapAt(const Offset(195, 60));
+    await settle(tester, 30);
     await tester.tap(find.bySemanticsLabel('Take seat 4'));
     await settle(tester);
     expect(find.bySemanticsLabel('Take seat 4'), findsNothing);

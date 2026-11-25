@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'gift_providers.dart';
 import 'room_levels.dart';
+import 'social_providers.dart' show userById;
 import 'models.dart';
 import 'repository.dart';
 
@@ -46,7 +47,10 @@ class SessionController extends Notifier<YoloUser?> {
     if (me != null) state = me.copyWith(id: id);
   }
 
-  void logout() => state = null;
+  void logout() {
+    ref.read(activeRoomProvider.notifier).exit();
+    state = null;
+  }
 
   /// Returns false when the balance is too low. Every change is written to the wallet ledger.
   bool spend(int coins, {String note = 'Spent'}) {
@@ -149,6 +153,8 @@ class RoomState {
   final bool sentGift, sentMessage;
   final int watchSecs;
   final Set<int> claimedBoxes;
+  final Set<int> onlineIds; // named users currently in the room
+  final int listeners; // other listeners (no profile loaded)
 
   const RoomState({
     required this.name,
@@ -189,6 +195,8 @@ class RoomState {
     this.sentMessage = false,
     this.watchSecs = 0,
     this.claimedBoxes = const {},
+    this.onlineIds = const {},
+    this.listeners = 0,
   });
 
   RoomState copyWith({
@@ -230,6 +238,8 @@ class RoomState {
     bool? sentMessage,
     int? watchSecs,
     Set<int>? claimedBoxes,
+    Set<int>? onlineIds,
+    int? listeners,
   }) =>
       RoomState(
         name: name ?? this.name,
@@ -270,7 +280,12 @@ class RoomState {
         sentMessage: sentMessage ?? this.sentMessage,
         watchSecs: watchSecs ?? this.watchSecs,
         claimedBoxes: claimedBoxes ?? this.claimedBoxes,
+        onlineIds: onlineIds ?? this.onlineIds,
+        listeners: listeners ?? this.listeners,
       );
+
+  /// Everyone in the room right now (named users + other listeners).
+  int get onlineCount => onlineIds.length + listeners;
 
   int get memberCount => memberBase + members.length;
 
@@ -308,6 +323,39 @@ class GiftEvent {
 final roomProvider =
     NotifierProvider.autoDispose.family<RoomController, RoomState, Room>(RoomController.new);
 
+/// The room the user is currently in (kept alive while minimized). null = not in a room.
+/// Entering another room replaces it, so there is never more than one live room session.
+final activeRoomProvider = NotifierProvider<ActiveRoomController, Room?>(ActiveRoomController.new);
+
+class ActiveRoomController extends Notifier<Room?> {
+  @override
+  Room? build() => null;
+
+  /// The canonical Room instance for [r] (reuses the live one when the id matches).
+  Room canonical(Room r) {
+    final cur = state;
+    return cur != null && cur.id == r.id ? cur : r;
+  }
+
+  void enter(Room r) {
+    if (state?.id != r.id) state = r;
+  }
+
+  void exit() => state = null;
+}
+
+/// How many voice-room screens are on screen (the floating mini room hides while > 0).
+final roomScreenOpenProvider = NotifierProvider<RoomScreenOpen, int>(RoomScreenOpen.new);
+
+class RoomScreenOpen extends Notifier<int> {
+  @override
+  int build() => 0;
+  void opened() => state++;
+  void closed() {
+    if (ref.mounted) state = state > 0 ? state - 1 : 0;
+  }
+}
+
 /// Room logic. In demo mode it simulates other users; with the Laravel
 /// backend these updates arrive over the `presence-room.{id}` channel.
 class RoomController extends Notifier<RoomState> {
@@ -318,12 +366,22 @@ class RoomController extends Notifier<RoomState> {
 
   @override
   RoomState build() {
+    // Stay alive while this is the active room (also when minimized); dispose once the user exits
+    // or enters another room.
+    final link = ref.keepAlive();
+    final active = ref.read(activeRoomProvider);
+    if (active != null && active.id != room.id) link.close();
+    ref.listen(activeRoomProvider, (_, next) {
+      if (next?.id != room.id) link.close();
+    });
     final speak = Timer.periodic(const Duration(milliseconds: 1400), (_) => _simulateSpeaking());
     final watch = Timer.periodic(const Duration(seconds: 1), (_) => _tickWatch());
+    final presence = Timer.periodic(const Duration(seconds: 8), (_) => _simulatePresence());
     final entry = Timer(const Duration(seconds: 3), () => state = state.copyWith(clearEntry: true));
     ref.onDispose(() {
       speak.cancel();
       watch.cancel();
+      presence.cancel();
       entry.cancel();
     });
     final others = [DemoUsers.zara, DemoUsers.kenji, DemoUsers.mia, null, DemoUsers.omar]
@@ -347,6 +405,8 @@ class RoomController extends Notifier<RoomState> {
       groupId: room.owner.id == me.id ? 1 : null,
       contributions: {DemoUsers.zara.id: 5200, DemoUsers.omar.id: 1999, DemoUsers.kenji.id: 520},
       entryBanner: '${me.name} entered the room',
+      onlineIds: {room.owner.id, me.id, for (final u in others) if (u != null) u.id},
+      listeners: max(0, room.online - 5),
       messages: [
         const RoomMessage(
             kind: MessageKind.system,
@@ -393,6 +453,35 @@ class RoomController extends Notifier<RoomState> {
     final secs = state.watchSecs + 1;
     state = state.copyWith(watchSecs: secs);
     if (secs % 300 == 0) addExp(roomExpPerFiveMinutes * (_me.vipLevel > 0 ? 2 : 1));
+  }
+
+  /// Demo presence: listeners come and go; Leo drops in and out. With Laravel these are presence-channel events.
+  void _simulatePresence() {
+    final ids = {...state.onlineIds};
+    String? banner;
+    if (!ids.contains(DemoUsers.leo.id) && _rand.nextInt(3) == 0 && !state.banned.contains(DemoUsers.leo.id)) {
+      ids.add(DemoUsers.leo.id);
+      banner = 'Leo entered the room';
+    } else if (ids.contains(DemoUsers.leo.id) && _rand.nextInt(4) == 0 && !state.seats.any((s) => s.user?.id == DemoUsers.leo.id)) {
+      ids.remove(DemoUsers.leo.id);
+    }
+    final delta = _rand.nextInt(3) - 1; // -1, 0, +1
+    state = state.copyWith(onlineIds: ids, listeners: max(0, state.listeners + delta), entryBanner: banner);
+    if (banner != null) {
+      Timer(const Duration(seconds: 3), () {
+        if (ref.mounted && state.entryBanner == banner) state = state.copyWith(clearEntry: true);
+      });
+    }
+  }
+
+  /// Top gift senders in this room (highest first), with real profiles.
+  List<(YoloUser, int)> topGifters([int n = 3]) {
+    final me = _me;
+    final rows = [
+      for (final e in state.contributions.entries)
+        if (e.value > 0) (e.key == me.id ? me : userById(e.key), e.value),
+    ]..sort((a, b) => b.$2.compareTo(a.$2));
+    return rows.take(n).toList();
   }
 
   void addExp(int exp) => state = state.copyWith(exp: state.exp + exp);
@@ -488,7 +577,7 @@ class RoomController extends Notifier<RoomState> {
   void ban(YoloUser u) {
     final i = state.seats.indexWhere((s) => s.user?.id == u.id);
     if (i >= 0) _setSeat(i, state.seats[i].copyWith(clearUser: true, speaking: false));
-    state = state.copyWith(banned: {...state.banned, u.id});
+    state = state.copyWith(banned: {...state.banned, u.id}, onlineIds: {...state.onlineIds}..remove(u.id));
     _system('${u.name} was banned from the room');
     _record('banned ${u.name}');
   }
