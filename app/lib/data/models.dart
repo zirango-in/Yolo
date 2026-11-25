@@ -117,7 +117,7 @@ class Seat {
       );
 }
 
-enum MessageKind { chat, system, gift, entry }
+enum MessageKind { chat, system, gift }
 
 class RoomMessage {
   final MessageKind kind;

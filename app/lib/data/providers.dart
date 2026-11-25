@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'gift_providers.dart';
 import 'room_levels.dart';
+import 'room_look.dart';
+import 'settings_providers.dart';
 import 'social_providers.dart' show userById;
 import 'models.dart';
 import 'repository.dart';
@@ -154,6 +156,20 @@ class RoomState {
   final Set<int> claimedBoxes;
   final Set<int> onlineIds; // named users currently in the room
   final int listeners; // other listeners (no profile loaded)
+  final String? bgPath; // custom background photo (room-wide)
+  final int? bgAccent; // main colour of that photo (ARGB), drives the room colours
+  final double bgAlignY; // crop position of the photo, -1 top … 1 bottom
+  final String roomMode; // normal, acquaint, auction, video, game
+  final String? auctionItem; // what is being auctioned (auction room)
+  final Map<int, int> auctionBids; // userId -> total coins bid
+  final String? videoUrl; // video being watched together (video room)
+  final String videoTitle;
+  final bool videoPlaying;
+  final String? roomGame; // game the room is playing together (game room)
+  final DateTime? promotedUntil; // recommendation card active until
+  final int promoUsed; // recommendation cards used today
+  final DateTime? lastRallyAt; // last "rally fans" call
+  final List<PresenceEvent> presence; // enter / leave events, newest last
 
   const RoomState({
     required this.name,
@@ -194,6 +210,20 @@ class RoomState {
     this.watchSecs = 0,
     this.claimedBoxes = const {},
     this.onlineIds = const {},
+    this.bgPath,
+    this.bgAccent,
+    this.bgAlignY = 0,
+    this.roomMode = 'normal',
+    this.auctionItem,
+    this.auctionBids = const {},
+    this.videoUrl,
+    this.videoTitle = '',
+    this.videoPlaying = false,
+    this.roomGame,
+    this.promotedUntil,
+    this.promoUsed = 0,
+    this.lastRallyAt,
+    this.presence = const [],
     this.listeners = 0,
   });
 
@@ -204,6 +234,24 @@ class RoomState {
     String? tag,
     String? coverPath,
     int? theme,
+    String? bgPath,
+    int? bgAccent,
+    double? bgAlignY,
+    bool clearBg = false,
+    String? roomMode,
+    String? auctionItem,
+    Map<int, int>? auctionBids,
+    bool clearAuction = false,
+    String? videoUrl,
+    String? videoTitle,
+    bool? videoPlaying,
+    bool clearVideo = false,
+    String? roomGame,
+    bool clearGame = false,
+    DateTime? promotedUntil,
+    int? promoUsed,
+    DateTime? lastRallyAt,
+    List<PresenceEvent>? presence,
     String? mode,
     bool? applyMode,
     List<Seat>? seats,
@@ -244,6 +292,20 @@ class RoomState {
         tag: tag ?? this.tag,
         coverPath: coverPath ?? this.coverPath,
         theme: theme ?? this.theme,
+        bgPath: clearBg ? null : (bgPath ?? this.bgPath),
+        bgAccent: clearBg ? null : (bgAccent ?? this.bgAccent),
+        bgAlignY: bgAlignY ?? this.bgAlignY,
+        roomMode: roomMode ?? this.roomMode,
+        auctionItem: clearAuction ? null : (auctionItem ?? this.auctionItem),
+        auctionBids: clearAuction ? const {} : (auctionBids ?? this.auctionBids),
+        videoUrl: clearVideo ? null : (videoUrl ?? this.videoUrl),
+        videoTitle: clearVideo ? '' : (videoTitle ?? this.videoTitle),
+        videoPlaying: clearVideo ? false : (videoPlaying ?? this.videoPlaying),
+        roomGame: clearGame ? null : (roomGame ?? this.roomGame),
+        promotedUntil: promotedUntil ?? this.promotedUntil,
+        promoUsed: promoUsed ?? this.promoUsed,
+        lastRallyAt: lastRallyAt ?? this.lastRallyAt,
+        presence: presence ?? this.presence,
         mode: mode ?? this.mode,
         applyMode: applyMode ?? this.applyMode,
         seats: seats ?? this.seats,
@@ -279,6 +341,24 @@ class RoomState {
         listeners: listeners ?? this.listeners,
       );
 
+  /// How the room looks right now: the custom photo if one is set, else the chosen theme.
+  RoomLook get look => bgPath != null && bgAccent != null ? RoomLook.photo(bgPath!, Color(bgAccent!), alignY: bgAlignY) : RoomLook.theme(theme);
+
+  bool get promoted => promotedUntil != null && promotedUntil!.isAfter(DateTime.now());
+
+  /// Highest bid in the auction (user, coins), or null.
+  (int, int)? get topBid {
+    if (auctionBids.isEmpty) return null;
+    final e = auctionBids.entries.reduce((a, b) => b.value > a.value ? b : a);
+    return (e.key, e.value);
+  }
+
+  static const roomModes = ['normal', 'acquaint', 'auction', 'video', 'game'];
+  static const roomModeNames = {'normal': 'Normal Room', 'acquaint': 'Acquaint Room', 'auction': 'Auction Room', 'video': 'Video Room', 'game': 'Game Room'};
+
+  /// Room categories shown in the room menu → stored room tag.
+  static const categories = [('Friends', 'Friends'), ('Music', 'Music'), ('Game', 'Games'), ('Chats', 'Chat')];
+
   /// Everyone in the room right now (named users + other listeners).
   int get onlineCount => onlineIds.length + listeners;
 
@@ -287,23 +367,18 @@ class RoomState {
   /// Treasure-box progress: watched time plus 60 s per completed task.
   int get treasureSecs => watchSecs + 60 * [sentGift, sentMessage].where((x) => x).length;
 
-  static const themes = [
-    [Color(0xFF3B1D78), Color(0xFF160C33)],
-    [Color(0xFF0C4A6E), Color(0xFF0B1026)],
-    [Color(0xFF831843), Color(0xFF1A0B1F)],
-    [Color(0xFF14532D), Color(0xFF071A12)],
-    [Color(0xFF78350F), Color(0xFF1C1206)],
-    [Color(0xFF1E293B), Color(0xFF020617)],
-    [Color(0xFF581C87), Color(0xFF0F0A1F)], // Club
-    [Color(0xFF92400E), Color(0xFF2A1503)], // Golden Party
-    [Color(0xFF155E75), Color(0xFF0B1220)], // Diamond Party
-    [Color(0xFF1E1B4B), Color(0xFF030014)], // Starfield
-    [Color(0xFF0E7490), Color(0xFF111827)], // Future City
-  ];
-  static const themeNames = ['Royal', 'Ocean', 'Rose', 'Forest', 'Sunset', 'Midnight', 'Club', 'Golden Party', 'Diamond Party', 'Starfield', 'Future City'];
+  static final themeNames = [for (final t in RoomLook.themes) t.name];
   static const themeUnlock = [1, 1, 1, 1, 1, 1, 2, 3, 4, 6, 8]; // room level needed
   static const tracks = ['Midnight Drive', 'Golden Hour', 'Neon Dreams', 'Lo-fi Chill', 'Party Starter', 'Slow Love'];
   static const tags = ['Chat', 'Music', 'Games', 'Friends', 'Dating', 'Poetry', 'Family', 'Private'];
+}
+
+/// Someone entered or left the room (shown in the fixed notice strip under the seats).
+class PresenceEvent {
+  final int serial;
+  final YoloUser user;
+  final bool entered;
+  const PresenceEvent(this.serial, this.user, this.entered);
 }
 
 class GiftEvent {
@@ -340,6 +415,26 @@ class ActiveRoomController extends Notifier<Room?> {
 }
 
 /// How many voice-room screens are on screen (the floating mini room hides while > 0).
+/// Room settings saved per room id (theme, background, mode, category…), so they come back
+/// when the room is reopened. With Laravel these come from GET /rooms/{id}.
+final roomSavedProvider = NotifierProvider<RoomSaved, Map<int, Map<String, Object?>>>(RoomSaved.new);
+
+class RoomSaved extends Notifier<Map<int, Map<String, Object?>>> {
+  @override
+  Map<int, Map<String, Object?>> build() => const {};
+  void save(int roomId, Map<String, Object?> data) => state = {...state, roomId: data};
+}
+
+/// Rooms boosted with a recommendation card (room id → until). Home shows them first.
+final promotedRoomsProvider = NotifierProvider<PromotedRooms, Map<int, DateTime>>(PromotedRooms.new);
+
+class PromotedRooms extends Notifier<Map<int, DateTime>> {
+  @override
+  Map<int, DateTime> build() => const {};
+  void promote(int roomId, DateTime until) => state = {...state, roomId: until};
+  bool isPromoted(int roomId) => state[roomId]?.isAfter(DateTime.now()) ?? false;
+}
+
 final roomScreenOpenProvider = NotifierProvider<RoomScreenOpen, int>(RoomScreenOpen.new);
 
 class RoomScreenOpen extends Notifier<int> {
@@ -381,7 +476,7 @@ class RoomController extends Notifier<RoomState> {
         .map((u) => u?.id == room.owner.id ? null : u)
         .toList();
     final me = _me;
-    return RoomState(
+    final fresh = RoomState(
       name: room.name,
       announcement: room.announcement,
       password: room.password,
@@ -405,11 +500,75 @@ class RoomController extends Notifier<RoomState> {
             text: 'Welcome to Yolo! Please be kind. Sexual content, hate, scams and illegal content are not allowed. '
                 'Moderators review rooms 24/7 — report anything that breaks the Safety guidelines.'),
         if (room.isFamily) const RoomMessage(kind: MessageKind.system, text: 'This is your family voice room.'),
-        // Entry notices sit right under the announcement, inside the scrolling chat.
-        RoomMessage(kind: MessageKind.entry, sender: me.name, senderId: me.id, text: 'entered the room'),
         RoomMessage(kind: MessageKind.chat, sender: 'Kenji', senderId: DemoUsers.kenji.id, text: 'Good evening everyone!', color: const Color(0xFF7DD3FC)),
         RoomMessage(kind: MessageKind.chat, sender: 'Mia', senderId: DemoUsers.mia.id, text: 'Who wants to play Ludo after this?', color: const Color(0xFF86EFAC)),
       ],
+    );
+    // Restore the room's saved settings (theme, background, mode, category…) and show my entry.
+    return _restore(fresh).copyWith(presence: [PresenceEvent(++_serial, me, true)]);
+  }
+
+  RoomState _restore(RoomState s) {
+    final saved = ref.read(roomSavedProvider)[room.id];
+    if (saved == null) return s;
+    return s.copyWith(
+      name: saved['name'] as String?,
+      announcement: saved['announcement'] as String?,
+      tag: saved['tag'] as String?,
+      theme: saved['theme'] as int?,
+      bgPath: saved['bgPath'] as String?,
+      bgAccent: saved['bgAccent'] as int?,
+      bgAlignY: saved['bgAlignY'] as double?,
+      roomMode: saved['roomMode'] as String?,
+      mode: saved['mode'] as String?,
+      coverPath: saved['coverPath'] as String?,
+      groupId: saved['groupId'] as int?,
+      promotedUntil: saved['promotedUntil'] as DateTime?,
+      promoUsed: saved['promoUsed'] as int?,
+      lastRallyAt: saved['lastRallyAt'] as DateTime?,
+    );
+  }
+
+  /// Saves room-wide settings so they come back when the room is reopened, and sends them to
+  /// the server (Laravel: PATCH /rooms/{id}/settings → broadcast to everyone in the room).
+  void _save() {
+    final st = state;
+    final data = <String, Object?>{
+      'name': st.name,
+      'announcement': st.announcement,
+      'tag': st.tag,
+      'theme': st.theme,
+      'bgPath': st.bgPath,
+      'bgAccent': st.bgAccent,
+      'bgAlignY': st.bgAlignY,
+      'roomMode': st.roomMode,
+      'mode': st.mode,
+      'coverPath': st.coverPath,
+      'groupId': st.groupId,
+      'promotedUntil': st.promotedUntil,
+      'promoUsed': st.promoUsed,
+      'lastRallyAt': st.lastRallyAt,
+    };
+    ref.read(roomSavedProvider.notifier).save(room.id, data);
+    ref.read(repositoryProvider).saveRoomSettings(room.id, {
+      for (final e in data.entries)
+        if (e.key != 'coverPath' && e.key != 'bgPath') e.key: e.value is DateTime ? (e.value! as DateTime).toIso8601String() : e.value,
+    }).ignore();
+  }
+
+  /// Applies settings another participant changed (called by the realtime room channel).
+  void applyRemoteSettings(Map<String, Object?> data) {
+    state = state.copyWith(
+      name: data['name'] as String?,
+      announcement: data['announcement'] as String?,
+      tag: data['tag'] as String?,
+      theme: data['theme'] as int?,
+      bgPath: data['bgPath'] as String?,
+      bgAccent: data['bgAccent'] as int?,
+      bgAlignY: (data['bgAlignY'] as num?)?.toDouble(),
+      clearBg: data.containsKey('bgPath') && data['bgPath'] == null,
+      roomMode: data['roomMode'] as String?,
+      mode: data['mode'] as String?,
     );
   }
 
@@ -452,24 +611,30 @@ class RoomController extends Notifier<RoomState> {
   /// Demo presence: listeners come and go; Leo drops in and out. With Laravel these are presence-channel events.
   void _simulatePresence() {
     final ids = {...state.onlineIds};
-    YoloUser? entered;
-    if (!ids.contains(DemoUsers.leo.id) && _rand.nextInt(3) == 0 && !state.banned.contains(DemoUsers.leo.id)) {
-      ids.add(DemoUsers.leo.id);
-      entered = DemoUsers.leo;
-    } else if (ids.contains(DemoUsers.leo.id) && _rand.nextInt(4) == 0 && !state.seats.any((s) => s.user?.id == DemoUsers.leo.id)) {
-      ids.remove(DemoUsers.leo.id);
-    }
+    final leo = DemoUsers.leo;
     final delta = _rand.nextInt(3) - 1; // -1, 0, +1
-    state = state.copyWith(onlineIds: ids, listeners: max(0, state.listeners + delta));
-    if (entered != null) userEntered(entered);
+    state = state.copyWith(listeners: max(0, state.listeners + delta));
+    if (!ids.contains(leo.id) && _rand.nextInt(3) == 0 && !state.banned.contains(leo.id)) {
+      userEntered(leo);
+    } else if (ids.contains(leo.id) && _rand.nextInt(4) == 0 && !state.seats.any((s) => s.user?.id == leo.id)) {
+      userLeft(leo);
+    }
   }
 
-  /// Adds an "X entered the room" notice to the chat. Skips a repeat of the same person's
-  /// notice when nothing else has been said since (no duplicates on quick re-joins).
-  void userEntered(YoloUser u) {
-    final last = state.messages.lastOrNull;
-    if (last != null && last.kind == MessageKind.entry && last.senderId == u.id) return;
-    state = state.copyWith(messages: [...state.messages, RoomMessage(kind: MessageKind.entry, sender: u.name, senderId: u.id, text: 'entered the room')]);
+  /// Someone joined: add them to the online list and queue an "entered" notice.
+  /// Laravel: presence channel `joining` event.
+  void userEntered(YoloUser u) => _presence(u, true);
+
+  /// Someone left: remove them and queue a "left" notice. Laravel: presence channel `leaving` event.
+  void userLeft(YoloUser u) => _presence(u, false);
+
+  void _presence(YoloUser u, bool entered) {
+    final online = state.onlineIds.contains(u.id);
+    if (online == entered) return; // already in / already gone → no duplicate notice
+    final ids = {...state.onlineIds};
+    entered ? ids.add(u.id) : ids.remove(u.id);
+    final log = [...state.presence, PresenceEvent(++_serial, u, entered)];
+    state = state.copyWith(onlineIds: ids, presence: log.length > 30 ? log.sublist(log.length - 30) : log);
   }
 
   /// Top gift senders in this room (highest first), with real profiles.
@@ -610,6 +775,10 @@ class RoomController extends Notifier<RoomState> {
     String? tag,
     String? coverPath,
     int? theme,
+    String? bgPath,
+    int? bgAccent,
+    double? bgAlignY,
+    bool clearBg = false,
     String? mode,
     bool? applyMode,
     bool? highQuality,
@@ -628,6 +797,10 @@ class RoomController extends Notifier<RoomState> {
       tag: tag,
       coverPath: coverPath,
       theme: theme,
+      bgPath: bgPath,
+      bgAccent: bgAccent,
+      bgAlignY: bgAlignY,
+      clearBg: clearBg,
       mode: mode,
       applyMode: applyMode,
       highQuality: highQuality,
@@ -640,7 +813,129 @@ class RoomController extends Notifier<RoomState> {
     );
     if (mode != null && mode != wasMode) _system(mode == 'intimacy' ? 'Owner enabled the Intimacy Seat' : 'Owner switched to normal seats');
     _record('updated room settings');
+    _save();
   }
+
+  /// Picking a predefined theme replaces any custom photo.
+  void setTheme(int i) => updateSettings(theme: i, clearBg: true);
+
+  // --- Room mode & category (room menu) ------------------------------------
+  /// Returns an error message, or '' when the mode changed.
+  String setRoomMode(String m) {
+    if (!canManage) return 'Only the owner and admins can change the room mode';
+    if (m == state.roomMode) return '';
+    state = state.copyWith(
+      roomMode: m,
+      mode: m == 'acquaint' ? 'intimacy' : 'normal', // acquaint = host + partner seats
+      clearAuction: m != 'auction',
+      clearVideo: m != 'video',
+      clearGame: m != 'game',
+    );
+    _system('${_me.name} switched to ${RoomState.roomModeNames[m]}');
+    _record('switched to ${RoomState.roomModeNames[m]}');
+    _save();
+    return '';
+  }
+
+  String setCategory(String tag) {
+    if (!canManage) return 'Only the owner and admins can change the category';
+    if (tag != state.tag) updateSettings(tag: tag);
+    return '';
+  }
+
+  // --- Auction room ----------------------------------------------------------
+  String startAuction(String item) {
+    if (!canManage) return 'Only the owner and admins can start an auction';
+    final t = item.trim();
+    if (t.isEmpty) return 'Enter what you are auctioning';
+    state = state.copyWith(auctionItem: t, auctionBids: const {});
+    _system('Auction started: $t. Bid with coins!');
+    return '';
+  }
+
+  /// Bids are paid in coins (they also count as Charms contribution to the room).
+  String bid(int coins) {
+    if (state.auctionItem == null) return 'No auction is running';
+    if (!ref.read(sessionProvider.notifier).spend(coins, note: 'Auction bid in ${state.name}')) return 'Not enough coins';
+    final total = (state.auctionBids[_me.id] ?? 0) + coins;
+    state = state.copyWith(
+      auctionBids: {...state.auctionBids, _me.id: total},
+      contributions: {...state.contributions, _me.id: (state.contributions[_me.id] ?? 0) + coins},
+    );
+    _system('${_me.name} bid $total coins');
+    return '';
+  }
+
+  String endAuction() {
+    if (!canManage) return 'Only the owner and admins can end the auction';
+    final top = state.topBid;
+    final item = state.auctionItem;
+    state = state.copyWith(clearAuction: true);
+    _system(top == null ? 'Auction for $item ended with no bids' : 'SOLD! ${top.$1 == _me.id ? _me.name : userById(top.$1).name} won $item for ${top.$2} coins');
+    return '';
+  }
+
+  // --- Video room ------------------------------------------------------------
+  String setVideo(String url, String title) {
+    if (!canManage) return 'Only the owner and admins can choose the video';
+    final u = Uri.tryParse(url.trim());
+    if (u == null || !(u.scheme == 'https' || u.scheme == 'http')) return 'Enter a video link (https://…)';
+    state = state.copyWith(videoUrl: url.trim(), videoTitle: title.trim().isEmpty ? 'Video' : title.trim(), videoPlaying: true);
+    _system('${_me.name} is playing "${state.videoTitle}" for everyone');
+    return '';
+  }
+
+  void toggleVideo() {
+    if (canManage && state.videoUrl != null) state = state.copyWith(videoPlaying: !state.videoPlaying);
+  }
+
+  void stopVideo() {
+    if (canManage) state = state.copyWith(clearVideo: true);
+  }
+
+  // --- Game room -------------------------------------------------------------
+  String setGame(String? game) {
+    if (!canManage) return 'Only the owner and admins can choose the game';
+    state = game == null ? state.copyWith(clearGame: true) : state.copyWith(roomGame: game);
+    if (game != null) _system('${_me.name} started $game — join from the game stage');
+    return '';
+  }
+
+  // --- Recommendation card & rally fans ---------------------------------------
+  int get recommendCardsLeft => max(0, levelForExp(state.exp).recommendCards - state.promoUsed);
+
+  /// Puts the room at the top of Home → Popular for 30 minutes.
+  String useRecommendCard() {
+    if (!canManage) return 'Only the owner and admins can use recommendation cards';
+    if (state.promoted) return 'The room is already recommended';
+    if (recommendCardsLeft == 0) return 'No recommendation cards left today';
+    final until = DateTime.now().add(const Duration(minutes: 30));
+    state = state.copyWith(promotedUntil: until, promoUsed: state.promoUsed + 1);
+    ref.read(promotedRoomsProvider.notifier).promote(room.id, until);
+    _system('${state.name} is now recommended on Home for 30 minutes');
+    _save();
+    return '';
+  }
+
+  /// Notifies the room's members and fans to come in (30-minute cooldown).
+  /// Laravel: POST /rooms/{id}/rally → push notification to members & fans.
+  String rallyFans(String message) {
+    if (!canManage) return 'Only the owner and admins can rally fans';
+    final last = state.lastRallyAt;
+    if (last != null && DateTime.now().difference(last) < const Duration(minutes: 30)) {
+      final left = 30 - DateTime.now().difference(last).inMinutes;
+      return 'You can rally again in $left min';
+    }
+    final text = message.trim().isEmpty ? 'Come join ${state.name}!' : message.trim();
+    state = state.copyWith(lastRallyAt: DateTime.now());
+    _system('${_me.name} rallied fans: $text');
+    ref.read(repositoryProvider).rallyFans(room.id, text).ignore();
+    _save();
+    return '';
+  }
+
+  /// Gift sound is a personal setting (same switch as Settings → Sound).
+  void toggleGiftSound() => ref.read(settingsProvider.notifier).update((s) => s.copyWith(giftSounds: !s.giftSounds));
 
   // --- Music ---------------------------------------------------------------
   void playTrack(int i) => state = state.copyWith(track: i, musicPlaying: true);

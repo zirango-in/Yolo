@@ -13,6 +13,7 @@ class YoloAvatar extends StatelessWidget {
     this.goldFrame = false,
     this.speaking = false,
     this.plain = false,
+    this.ringColor,
   });
 
   final YoloUser user;
@@ -22,6 +23,9 @@ class YoloAvatar extends StatelessWidget {
 
   /// No frame or outline: just the round picture.
   final bool plain;
+
+  /// Colour of the frame / speaking ring (defaults to gold). Rooms pass their theme accent.
+  final Color? ringColor;
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +46,13 @@ class YoloAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: ring
-            ? const SweepGradient(colors: [YoloColors.gold, Color(0xFFFFE9A8), YoloColors.goldDeep, YoloColors.gold])
+            ? (ringColor == null
+                ? const SweepGradient(colors: [YoloColors.gold, Color(0xFFFFE9A8), YoloColors.goldDeep, YoloColors.gold])
+                : SweepGradient(colors: [ringColor!, Color.lerp(ringColor, Colors.white, 0.6)!, Color.lerp(ringColor, Colors.black, 0.35)!, ringColor!]))
             : null,
         color: ring ? null : Colors.white.withValues(alpha: 0.14),
         boxShadow: speaking
-            ? [BoxShadow(color: YoloColors.gold.withValues(alpha: 0.6), blurRadius: 18, spreadRadius: 1)]
+            ? [BoxShadow(color: (ringColor ?? YoloColors.gold).withValues(alpha: 0.6), blurRadius: 18, spreadRadius: 1)]
             : null,
       ),
       child: Container(

@@ -12,6 +12,7 @@ import '../../widgets/common.dart';
 import '../../widgets/page_kit.dart';
 import 'room_panels.dart';
 import 'room_sheets.dart';
+import 'room_theme_sheet.dart';
 
 /// Room level: badge, EXP progress, today's tasks and the level explanation table.
 class RoomLevelScreen extends ConsumerStatefulWidget {
@@ -268,26 +269,18 @@ class RoomSettingsScreen extends ConsumerWidget {
             final v = await _text(context, 'Announcement', st.announcement, max: 200, lines: 3);
             if (v != null) ctrl.updateSettings(announcement: v);
           }),
-          row('Mode', st.mode == 'intimacy' ? 'Intimacy seat' : 'Normal', () async {
-            final v = await _choose(context, 'Seat mode', const [('normal', 'Normal'), ('intimacy', 'Intimacy seat (host + partner)')], st.mode);
-            if (v != null) ctrl.updateSettings(mode: v);
+          row('Room mode', RoomState.roomModeNames[st.roomMode]!, () async {
+            final v = await _choose(context, 'Room mode', [for (final m in RoomState.roomModes) (m, RoomState.roomModeNames[m]!)], st.roomMode);
+            if (v != null) {
+              final msg = ctrl.setRoomMode(v);
+              if (msg.isNotEmpty && context.mounted) showYoloToast(context, msg);
+            }
           }),
           row('Tag', st.tag, () async {
             final v = await _choose(context, 'Tag', [for (final t in RoomState.tags) (t, t)], st.tag);
             if (v != null) ctrl.updateSettings(tag: v);
           }),
-          row('Background', RoomState.themeNames[st.theme], () async {
-            final v = await _choose(context, 'Background', [
-              for (var i = 0; i < RoomState.themeNames.length; i++)
-                (i, RoomState.themeUnlock[i] > lvl.level ? '${RoomState.themeNames[i]}  ·  unlocks at Lv${RoomState.themeUnlock[i]}' : RoomState.themeNames[i]),
-            ], st.theme);
-            if (v == null) return;
-            if (RoomState.themeUnlock[v] > lvl.level) {
-              if (context.mounted) showYoloToast(context, 'Reach room level ${RoomState.themeUnlock[v]} to use this background');
-              return;
-            }
-            ctrl.updateSettings(theme: v);
-          }),
+          row('Theme & background', st.bgPath != null ? 'My photo' : RoomState.themeNames[st.theme], () => showRoomThemeSheet(context, ref, room)),
           row('Mic mode', st.applyMode ? 'Request to join' : 'Free', () async {
             final v = await _choose(context, 'Mic mode', const [(false, 'Free — anyone can take a seat'), (true, 'Request — host approves')], st.applyMode);
             if (v != null) ctrl.updateSettings(applyMode: v);

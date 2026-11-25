@@ -100,48 +100,115 @@ YoloUser roomUser(WidgetRef ref, int id) {
 
 String _lastActive(int id) => const ['today', 'today', '3 days ago', '8 days ago', '9 days ago'][id % 5];
 
-/// Tap the room name: cover, tags, level, owner/admins, online/members, fans, nation, announcement.
+/// Room details (tap the room image or name): cover, name, Room ID, level, follow, settings,
+/// share, owner / partner (co-owner) / admins, online & members, group and announcement.
 void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
   showRoomSheet<void>(
     context,
     (c) => Consumer(builder: (c, ref, _) {
       final st = ref.watch(roomProvider(room));
       final ctrl = ref.read(roomProvider(room).notifier);
+      final look = st.look;
       final lvl = levelForExp(st.exp);
       final next = nextLevel(lvl);
       final staff = <int>{room.owner.id, ...st.coOwners, ...st.admins}.toList();
-      final online = st.onlineCount;
       final isOwner = ctrl.roleOf(ref.read(sessionProvider)!.id) == 'Owner';
+      final group = ref.watch(groupsProvider).where((g) => g.id == st.groupId).firstOrNull;
+      final levelColor = roomLevelColors(lvl.level).first;
+
+      Widget countCard(String label, String value, Color color, VoidCallback onTap) => Expanded(
+            child: Semantics(
+              button: true,
+              excludeSemantics: true,
+              label: '$label $value',
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: onTap,
+                child: Container(
+                  height: 54,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: color.withValues(alpha: 0.35)),
+                  ),
+                  child: Row(children: [
+                    Expanded(
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700)),
+                        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color, height: 1.15)),
+                      ]),
+                    ),
+                    Icon(Icons.chevron_right_rounded, size: 18, color: color),
+                  ]),
+                ),
+              ),
+            ),
+          );
+
       return SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
               child: SizedBox(
-                width: 84,
-                height: 84,
+                width: 64,
+                height: 64,
                 child: st.coverPath != null && !kIsWeb
                     ? Image.file(File(st.coverPath!), fit: BoxFit.cover)
                     : DecoratedBox(
                         decoration: BoxDecoration(gradient: LinearGradient(colors: room.cover)),
-                        child: Center(child: Text(st.name[0], style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w900))),
+                        child: Center(child: Text(st.name[0], style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900))),
                       ),
               ),
             ),
-            const Spacer(),
-            if (ctrl.canManage)
-              IconButton.filledTonal(
-                tooltip: 'Room settings',
-                onPressed: () {
-                  Navigator.pop(c);
-                  context.push('/room/settings', extra: room);
-                },
-                icon: const Icon(Icons.settings_rounded),
-              ),
-            const SizedBox(width: 8),
-            IconButton.filledTonal(
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(st.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, height: 1.2)),
+                const SizedBox(height: 5),
+                Wrap(spacing: 6, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(2, 1, 6, 1),
+                    decoration: BoxDecoration(color: levelColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      RoomLevelBadge(lvl.level, size: 14),
+                      const SizedBox(width: 3),
+                      Text('Level ${lvl.level}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: levelColor)),
+                    ]),
+                  ),
+                  Badge2(st.tag, bg: look.accent.withValues(alpha: 0.18), fg: look.accent),
+                  InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: '${room.id}'));
+                      showYoloToast(context, 'Room ID copied');
+                    },
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text('Room ID: ${room.id}', style: const TextStyle(fontSize: 12, color: YoloColors.textMuted)),
+                      const SizedBox(width: 3),
+                      const Icon(Icons.copy_rounded, size: 12, color: YoloColors.textMuted),
+                    ]),
+                  ),
+                ]),
+              ]),
+            ),
+            IconButton(
+              tooltip: 'Room settings',
+              visualDensity: VisualDensity.compact,
+              onPressed: () {
+                if (!ctrl.canManage) {
+                  showYoloToast(c, 'Only the owner and admins can open room settings');
+                  return;
+                }
+                Navigator.pop(c);
+                context.push('/room/settings', extra: room);
+              },
+              icon: const Icon(Icons.settings_rounded),
+            ),
+            IconButton(
               tooltip: 'Share room',
+              visualDensity: VisualDensity.compact,
               onPressed: () {
                 Navigator.pop(c);
                 showInviteSheet(context, ref, room);
@@ -149,12 +216,13 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
               icon: const Icon(Icons.ios_share_rounded),
             ),
           ]),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(child: Text(st.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900))),
-            // Follow / unfollow lives here (not on the main room screen).
-            if (!isOwner)
-              ctrl.isMember
+          // Follow / unfollow lives here (not on the main room screen).
+          if (!isOwner) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              height: 38,
+              child: ctrl.isMember
                   ? OutlinedButton.icon(
                       onPressed: () {
                         ctrl.leaveMembership();
@@ -162,133 +230,107 @@ void showRoomInfoSheet(BuildContext context, WidgetRef ref, Room room) {
                       },
                       icon: const Icon(Icons.check_rounded, size: 16),
                       label: const Text('Following'),
-                      style: OutlinedButton.styleFrom(foregroundColor: YoloColors.textSoft, visualDensity: VisualDensity.compact),
+                      style: OutlinedButton.styleFrom(foregroundColor: YoloColors.textSoft),
                     )
                   : FilledButton.icon(
                       onPressed: () => showYoloToast(context, ctrl.join()),
                       icon: const Icon(Icons.add_rounded, size: 16),
                       label: const Text('Follow'),
-                      style: FilledButton.styleFrom(backgroundColor: YoloColors.gold, foregroundColor: YoloColors.onGold, visualDensity: VisualDensity.compact),
+                      style: FilledButton.styleFrom(backgroundColor: look.accent, foregroundColor: look.onAccent),
                     ),
-          ]),
-          const SizedBox(height: 6),
-          Row(children: [
-            Badge2(st.tag, bg: const Color(0x337DD3FC), fg: const Color(0xFF7DD3FC)),
-            const SizedBox(width: 6),
-            if (lvl.level >= 5) const Badge2('Advanced', bg: Color(0x22FFFFFF), fg: YoloColors.textSoft),
-            const SizedBox(width: 6),
-            InkWell(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: '${room.id}'));
-                showYoloToast(context, 'Room ID copied');
-              },
-              child: Row(children: [
-                Text('Room ID: ${room.id}', style: const TextStyle(color: YoloColors.textMuted)),
-                const SizedBox(width: 4),
-                const Icon(Icons.copy_rounded, size: 14, color: YoloColors.textMuted),
-              ]),
             ),
-          ]),
-          const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 10),
           GlassCard(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             onTap: () {
               Navigator.pop(c);
               context.push('/room/level', extra: room);
             },
             child: Row(children: [
-              RoomLevelBadge(lvl.level, size: 40),
-              const SizedBox(width: 12),
+              RoomLevelBadge(lvl.level, size: 30),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Room level ${lvl.level}', style: const TextStyle(fontWeight: FontWeight.w800)),
+                  Text('Room level ${lvl.level}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
                   const SizedBox(height: 4),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: next == null ? 1 : ((st.exp - lvl.exp) / (next.exp - lvl.exp)).clamp(0.0, 1.0),
-                      minHeight: 6,
-                      color: roomLevelColors(lvl.level).first,
+                      minHeight: 5,
+                      color: levelColor,
                       backgroundColor: const Color(0x22FFFFFF),
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(next == null ? 'Max level' : 'EXP ${formatCoins(st.exp)} / ${formatCoins(next.exp)}', style: const TextStyle(fontSize: 11, color: YoloColors.textMuted)),
+                  Text(next == null ? 'Max level' : 'EXP ${formatCoins(st.exp)} / ${formatCoins(next.exp)}', style: const TextStyle(fontSize: 10.5, color: YoloColors.textMuted)),
                 ]),
               ),
               const Icon(Icons.chevron_right_rounded),
             ]),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
+          const Text('Owner, partner & admins', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: YoloColors.textMuted)),
+          const SizedBox(height: 6),
           SizedBox(
-            height: 118,
+            height: 92,
             child: ListView(scrollDirection: Axis.horizontal, children: [
               for (final id in staff)
                 Padding(
-                  padding: const EdgeInsets.only(right: 14),
+                  padding: const EdgeInsets.only(right: 12),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.pop(c);
                       showUserCard(context, ref, room, roomUser(ref, id));
                     },
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      YoloAvatar(user: roomUser(ref, id), size: 52, goldFrame: id == room.owner.id),
-                      const SizedBox(height: 4),
-                      SizedBox(width: 64, child: Text(roomUser(ref, id).name, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11))),
-                      RolePill(ctrl.roleOf(id)),
+                      YoloAvatar(user: roomUser(ref, id), size: 44, plain: true),
+                      const SizedBox(height: 3),
+                      SizedBox(width: 60, child: Text(roomUser(ref, id).name, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11))),
+                      const SizedBox(height: 2),
+                      RolePill(ctrl.roleOf(id) == 'Co-owner' ? 'Co-owner' : ctrl.roleOf(id)),
                     ]),
                   ),
                 ),
             ]),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Row(children: [
-            Expanded(
-              child: GlassCard(
-                padding: const EdgeInsets.all(14),
-                border: YoloColors.online.withValues(alpha: 0.5),
-                onTap: () {
-                  Navigator.pop(c);
-                  showMembersSheet(context, ref, room);
-                },
-                child: Row(children: [
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text('Online', style: TextStyle(color: YoloColors.online, fontWeight: FontWeight.w700)),
-                      Text('$online', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: YoloColors.online)),
-                    ]),
-                  ),
-                  const Icon(Icons.chevron_right_rounded, color: YoloColors.online),
-                ]),
-              ),
+            countCard('Online', formatCoins(st.onlineCount), YoloColors.online, () {
+              Navigator.pop(c);
+              showMembersSheet(context, ref, room);
+            }),
+            const SizedBox(width: 10),
+            countCard('Members', formatCoins(st.memberCount), look.accent, () {
+              Navigator.pop(c);
+              showMembersSheet(context, ref, room, tab: 1);
+            }),
+          ]),
+          if (group != null) ...[
+            const SizedBox(height: 8),
+            ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.forum_rounded, color: look.accent),
+              title: Text('Group: ${group.name}', style: const TextStyle(fontWeight: FontWeight.w700)),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                Navigator.pop(c);
+                context.push('/chat', extra: group);
+              },
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: GlassCard(
-                padding: const EdgeInsets.all(14),
-                border: YoloColors.gold.withValues(alpha: 0.5),
-                onTap: () {
-                  Navigator.pop(c);
-                  showMembersSheet(context, ref, room, tab: 1);
-                },
-                child: Row(children: [
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text('Members', style: TextStyle(color: YoloColors.gold, fontWeight: FontWeight.w700)),
-                      Text(formatCoins(st.memberCount), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: YoloColors.gold)),
-                    ]),
-                  ),
-                  const Icon(Icons.chevron_right_rounded, color: YoloColors.gold),
-                ]),
-              ),
-            ),
+          ],
+          const SizedBox(height: 8),
+          Row(children: [
+            Text('Fans ${formatCoins(st.fans)}', style: const TextStyle(fontSize: 12, color: YoloColors.textMuted)),
+            const SizedBox(width: 14),
+            Text('Max members ${formatCoins(lvl.maxMembers)}', style: const TextStyle(fontSize: 12, color: YoloColors.textMuted)),
           ]),
           const SizedBox(height: 10),
-          for (final (k, v) in [('Fans', formatCoins(st.fans)), ('Nation', 'India'), ('Max members', formatCoins(lvl.maxMembers))])
-            ListTile(contentPadding: EdgeInsets.zero, title: Text(k, style: const TextStyle(color: YoloColors.textMuted)), trailing: Text(v, style: const TextStyle(fontWeight: FontWeight.w700))),
-          const Text('Announcement', style: TextStyle(color: YoloColors.textMuted)),
-          const SizedBox(height: 4),
-          Text(st.announcement.isEmpty ? 'No announcement yet' : st.announcement),
+          Text('Announcement', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: look.accent)),
+          const SizedBox(height: 3),
+          Text(st.announcement.isEmpty ? 'No announcement yet' : st.announcement, style: const TextStyle(fontSize: 13, height: 1.4)),
         ]),
       );
     }),
@@ -375,9 +417,10 @@ class _MembersSheetState extends ConsumerState<_MembersSheet> {
     final onlineUsers = [for (final id in st.onlineIds) if (!st.banned.contains(id)) roomUser(ref, id)].where(match).toList();
     final memberUsers = <YoloUser>{if (st.members.contains(me.id)) me, ...demoAllUsers.where((u) => st.members.contains(u.id))}.where(match).toList()
       ..sort((a, b) => ['Owner', 'Co-owner', 'Admin', 'Member'].indexOf(ctrl.roleOf(a.id)).compareTo(['Owner', 'Co-owner', 'Admin', 'Member'].indexOf(ctrl.roleOf(b.id))));
-    const mult = [1, 5, 18];
+    // Charms recorded in this room session (weekly / total history comes from the server:
+    // GET /rooms/{id}/contributions?period=…).
     final contrib = [
-      for (final e in st.contributions.entries) (roomUser(ref, e.key), e.value * mult[_period] + (e.key == me.id ? 0 : _period * 300)),
+      for (final e in st.contributions.entries) if (e.value > 0) (roomUser(ref, e.key), e.value),
     ]..sort((a, b) => b.$2.compareTo(a.$2));
     final myIndex = contrib.indexWhere((r) => r.$1.id == me.id);
 
@@ -471,7 +514,7 @@ class _MembersSheetState extends ConsumerState<_MembersSheet> {
             ]),
           _ => ListView(children: [
               for (final (i, (u, coins)) in contrib.indexed)
-                row(u, trailing: Text('${formatCoins(coins)}\nGold', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.w800, color: i == 0 ? YoloColors.gold : YoloColors.text))),
+                row(u, trailing: Text('${formatCoins(coins)}\nCharms', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.w800, color: i == 0 ? const Color(0xFFF0ABFC) : YoloColors.text))),
             ]),
         },
       ),
@@ -483,7 +526,7 @@ class _MembersSheetState extends ConsumerState<_MembersSheet> {
             child: ListTile(
               leading: YoloAvatar(user: me, size: 42),
               title: Text(myIndex >= 0 ? 'My rank #${myIndex + 1}' : 'Not ranked yet', style: const TextStyle(fontWeight: FontWeight.w800)),
-              trailing: Text(myIndex >= 0 ? '${formatCoins(contrib[myIndex].$2)} Gold' : 'Send a gift to rank', style: const TextStyle(color: YoloColors.gold, fontWeight: FontWeight.w700)),
+              trailing: Text(myIndex >= 0 ? '${formatCoins(contrib[myIndex].$2)} Charms' : 'Send a gift to rank', style: const TextStyle(color: Color(0xFFF0ABFC), fontWeight: FontWeight.w700)),
             ),
           ),
         ),

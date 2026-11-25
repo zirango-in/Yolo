@@ -3,9 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'package:yolo/data/models.dart';
 import 'package:yolo/data/providers.dart';
 import 'package:yolo/data/repository.dart';
+import 'package:yolo/data/room_look.dart';
+import 'package:yolo/data/settings_providers.dart';
 import 'package:yolo/main.dart';
 
 Future<void> settle(WidgetTester t, [int frames = 12]) async {
@@ -57,14 +58,23 @@ void main() {
     expect(find.text('Follow'), findsNothing);
     expect(find.bySemanticsLabel('Back'), findsNothing);
 
-    // Chat: system note, then the announcement, then my entry notice — all in the scrolling list
+    // Chat: system note then the announcement, in the scrolling list
     expect(find.textContaining('Announcement:'), findsOneWidget);
-    expect(st().messages.where((m) => m.kind == MessageKind.entry).length, 1);
+    expect(find.textContaining('System:'), findsOneWidget);
+    // Enter / leave notices: fixed strip under the seats, queued, not in the chat, no duplicates
     final ctl = c.read(roomProvider(room).notifier);
     ctl.userEntered(DemoUsers.leo);
-    ctl.userEntered(DemoUsers.leo); // quick re-join: no duplicate notice
-    await settle(tester);
-    expect(st().messages.where((m) => m.kind == MessageKind.entry && m.senderId == DemoUsers.leo.id).length, 1);
+    ctl.userEntered(DemoUsers.leo); // already in → no second notice
+    await settle(tester, 3);
+    expect(st().presence.where((e) => e.user.id == DemoUsers.leo.id).length, 1);
+    expect(st().onlineIds.contains(DemoUsers.leo.id), isTrue);
+    expect(find.text('Leo entered the room'), findsOneWidget);
+    ctl.userLeft(DemoUsers.leo); // queued behind the entry notice
+    expect(st().onlineIds.contains(DemoUsers.leo.id), isFalse);
+    await settle(tester, 30);
+    expect(find.text('Leo left the room'), findsOneWidget);
+    await settle(tester, 30);
+    expect(st().messages.any((m) => m.text.contains('entered the room')), isFalse);
 
     // Top contributors come from the room's real gifting totals (Zara leads)
     expect(ctl.topGifters().first.$1.id, DemoUsers.zara.id);
@@ -72,13 +82,90 @@ void main() {
     // Four-dot menu holds every room feature, including Red packet and Music
     await tester.tap(find.bySemanticsLabel('More features'));
     await settle(tester);
-    for (final label in ['Red packet', 'Music', 'Settings', 'Room info', 'Room level', 'Members', 'Invite', 'Ranking']) {
+    for (final label in ['Daily Treasure', 'Red Packet', 'Music', 'Emotes', 'Gifting', 'Room Info', 'Room Level', 'Members', 'Invite', 'Ranking']) {
       expect(find.text(label), findsOneWidget, reason: label);
     }
     await tester.tap(find.text('Music'));
     await settle(tester);
     expect(find.textContaining('Music'), findsWidgets);
     await tester.tapAt(const Offset(195, 60));
+    await settle(tester, 30);
+
+    // Top drawer: five room modes, four categories, room functions
+    await tester.tap(find.byTooltip('Room menu'));
+    await settle(tester);
+    for (final m in ['Normal Room', 'Acquaint Room', 'Auction Room', 'Video Room', 'Game Room']) {
+      expect(find.bySemanticsLabel(m), findsOneWidget, reason: m);
+    }
+    for (final cat in ['Friends', 'Music', 'Game', 'Chats']) {
+      expect(find.bySemanticsLabel('Category $cat'), findsOneWidget, reason: cat);
+    }
+    for (final f in ['Share', 'Gift Sound', 'Report Room', 'Exit', 'Settings', 'Recommendation Card', 'Rally Fans']) {
+      expect(find.bySemanticsLabel(f), findsOneWidget, reason: f);
+    }
+    await tester.tap(find.bySemanticsLabel('Auction Room'));
+    await settle(tester);
+    expect(st().roomMode, 'auction');
+    await tester.tap(find.bySemanticsLabel('Category Music'));
+    await settle(tester);
+    expect(st().tag, 'Music');
+    await tester.tap(find.bySemanticsLabel('Gift Sound'));
+    await settle(tester);
+    expect(c.read(settingsProvider).giftSounds, isFalse);
+    await tester.tap(find.byTooltip('Close room menu')); // the ••• again closes it
+    await settle(tester);
+    expect(find.bySemanticsLabel('Auction Room'), findsNothing);
+    await settle(tester, 30);
+
+    // Auction stage: start, bid with coins, end → winner announced
+    await tester.tap(find.text('Start'));
+    await settle(tester);
+    await tester.enterText(find.byKey(const Key('auction-item')), 'Song request');
+    await tester.tap(find.text('OK'));
+    await settle(tester);
+    expect(st().auctionItem, 'Song request');
+    final cb = coins();
+    await tester.tap(find.text('Bid'));
+    await settle(tester);
+    await tester.tap(find.text('500').last);
+    await settle(tester);
+    expect(coins(), cb - 500);
+    expect(st().topBid?.$2, 500);
+    await tester.tap(find.text('End'));
+    await settle(tester);
+    expect(st().auctionItem, isNull);
+    expect(find.textContaining('SOLD!'), findsOneWidget);
+    // Game room: start Mic Grab for the room; video room validates links
+    expect(ctl.setRoomMode('game'), '');
+    await settle(tester);
+    await tester.tap(find.text('Mic Grab'));
+    await settle(tester);
+    expect(st().roomGame, 'Mic Grab');
+    expect(find.text('Playing Mic Grab'), findsOneWidget);
+    expect(ctl.setRoomMode('video'), '');
+    expect(ctl.setVideo('not a link', 'x'), isNotEmpty);
+    expect(ctl.setRoomMode('normal'), '');
+    expect(st().roomGame, isNull);
+    await settle(tester, 30);
+
+    // Recommendation card → room shows first on Home; rally fans (with cooldown)
+    await tester.tap(find.byTooltip('Room menu'));
+    await settle(tester);
+    await tester.tap(find.bySemanticsLabel('Recommendation Card'));
+    await settle(tester);
+    await tester.tap(find.text('Use a card'));
+    await settle(tester);
+    expect(st().promoted, isTrue);
+    expect(c.read(promotedRoomsProvider).containsKey(room.id), isTrue);
+    await closeSheet(tester);
+    await tester.tap(find.byTooltip('Room menu'));
+    await settle(tester);
+    await tester.tap(find.bySemanticsLabel('Rally Fans'));
+    await settle(tester);
+    await tester.tap(find.text('Rally now'));
+    await settle(tester);
+    expect(st().lastRallyAt, isNotNull);
+    expect(ctl.rallyFans(''), contains('rally again'));
     await settle(tester, 30);
 
     // Owner: lock an empty seat; mute, make admin, remove Zara from mic
@@ -108,25 +195,34 @@ void main() {
     await tester.tap(find.text('Save'));
     await settle(tester);
     expect(st().announcement, 'Be nice!');
-    // Locked background (Starfield needs Lv6), then an unlocked one
-    await tester.tap(find.text('Background'));
+    // Theme sheet: locked theme (Starfield needs Lv6), then Ocean re-colours the room
+    await tester.tap(find.text('Theme & background'));
     await settle(tester);
-    await tester.tap(find.textContaining('Starfield'));
+    await tester.tap(find.bySemanticsLabel('Starfield'));
     await settle(tester);
     expect(find.text('Reach room level 6 to use this background'), findsOneWidget);
     expect(st().theme, 0);
     await settle(tester, 20);
-    await tester.tap(find.text('Background'));
-    await settle(tester);
-    await tester.tap(find.text('Ocean'));
+    await tester.tap(find.bySemanticsLabel('Ocean'));
     await settle(tester);
     expect(st().theme, 1);
-    // Mode → intimacy
-    await tester.tap(find.text('Mode'));
+    expect(st().look.accent, RoomLook.themes[1].accent);
+    // Custom photo: its colour drives the room accent; picking a theme removes it again
+    ctl.updateSettings(bgPath: '/missing/bg.jpg', bgAccent: 0xFF22AA66, bgAlignY: 0.3);
     await settle(tester);
-    await tester.tap(find.textContaining('Intimacy seat'));
+    expect(st().look.imagePath, '/missing/bg.jpg');
+    expect(st().look.accent, isNot(RoomLook.themes[1].accent));
+    await tester.tap(find.bySemanticsLabel('Ocean'));
+    await settle(tester);
+    expect(st().bgPath, isNull);
+    await closeSheet(tester);
+    // Room mode → Acquaint (host + partner seats)
+    await tester.tap(find.text('Room mode'));
+    await settle(tester);
+    await tester.tap(find.text('Acquaint Room'));
     await settle(tester);
     expect(st().mode, 'intimacy');
+    expect(st().roomMode, 'acquaint');
     // Toggles
     await tester.tap(find.text('Ban text chatting'));
     await settle(tester);
@@ -151,7 +247,8 @@ void main() {
     expect(st().fee, 500);
     router.pop();
     await settle(tester);
-    expect(find.text('Partner'), findsOneWidget); // intimacy seat on screen
+    expect(find.bySemanticsLabel('Take seat 1'), findsOneWidget); // partner seat next to the host
+    expect(find.text('HOST'), findsNothing); // labels removed, roles kept
 
     // Members sheet: tabs + make Zara admin
     await tester.tap(find.bySemanticsLabel('Online users'));
@@ -185,7 +282,7 @@ void main() {
     await settle(tester);
 
     // User card on the host → mention fills the input
-    await tester.tap(find.text('HOST'));
+    await tester.tap(find.bySemanticsLabel('Host Aria'));
     await settle(tester);
     await tester.tap(find.byTooltip('Mention Aria'));
     await settle(tester);
@@ -205,7 +302,7 @@ void main() {
     final before = coins();
     await tester.tap(find.bySemanticsLabel('More features'));
     await settle(tester);
-    await tester.tap(find.text('Red packet'));
+    await tester.tap(find.text('Red Packet'));
     await settle(tester);
     await tester.tap(find.text('Send 100 coins'));
     await settle(tester, 25);
@@ -219,7 +316,10 @@ void main() {
     await closeSheet(tester);
 
     // Treasure: member + gift/message tasks cut the timer; box 1 (1 min) opens
-    await tester.tap(find.bySemanticsLabel('Treasure boxes'));
+    expect(find.bySemanticsLabel('Treasure boxes'), findsNothing); // moved into the four-dot menu
+    await tester.tap(find.bySemanticsLabel('More features'));
+    await settle(tester);
+    await tester.tap(find.text('Daily Treasure'));
     await settle(tester);
     final b2 = coins();
     await tester.tap(find.text('Open').first);
@@ -247,15 +347,26 @@ void main() {
       expect(st().claimedBoxes.contains(0), isTrue); // same session, nothing reloaded
     }
 
-    // Exit explicitly from the room menu: session ends and the mini room goes away
+    // Exit from the top drawer: session ends and the mini room goes away
     await tester.tap(find.byTooltip('Room menu'));
     await settle(tester);
-    await tester.tap(find.text('Exit'));
-    await settle(tester);
-    await tester.tap(find.text('Exit room'));
+    await tester.tap(find.bySemanticsLabel('Exit'));
     await settle(tester);
     expect(c.read(activeRoomProvider), isNull);
     expect(find.bySemanticsLabel('Return to Aria Night Club'), findsNothing);
+
+    // Rejoin: theme, mode and category come back (saved per room)
+    router.push('/room', extra: room);
+    await settle(tester, 20);
+    expect(st().theme, 1);
+    expect(st().roomMode, 'acquaint');
+    expect(st().tag, 'Music');
+    expect(st().seats.any((x) => x.user?.id == c.read(sessionProvider)!.id), isFalse); // seat was released on exit
+    await tester.tap(find.byTooltip('Room menu'));
+    await settle(tester);
+    await tester.tap(find.bySemanticsLabel('Exit'));
+    await settle(tester);
+    expect(c.read(activeRoomProvider), isNull);
 
     // Private room (VIP Lounge, 1234) as a guest: join as member, take a seat
     await tester.scrollUntilVisible(find.text('VIP Lounge'), 300, scrollable: find.byType(Scrollable).first);

@@ -133,7 +133,13 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
   @override
   Widget build(BuildContext context) {
     final me = ref.watch(sessionProvider);
-    final rooms = ref.watch(roomsProvider(_tabs[_tab].toLowerCase())).whenData((l) => [...ref.watch(createdRoomsProvider), ...l]);
+    final promoted = ref.watch(promotedRoomsProvider);
+    bool boosted(Room r) => promoted[r.id]?.isAfter(DateTime.now()) ?? false;
+    // Rooms boosted with a recommendation card come first.
+    final rooms = ref.watch(roomsProvider(_tabs[_tab].toLowerCase())).whenData((l) {
+      final all = [...ref.watch(createdRoomsProvider), ...l];
+      return [...all.where(boosted), ...all.where((r) => !boosted(r))];
+    });
 
     return Stack(children: [
       Positioned(
@@ -372,6 +378,16 @@ class _RoomCard extends ConsumerWidget {
                   ),
                   if (room.isPrivate)
                     const Positioned(top: 8, right: 8, child: Icon(Icons.lock_rounded, size: 18, color: YoloColors.gold)),
+                  if (ref.watch(promotedRoomsProvider.select((m) => m[room.id]?.isAfter(DateTime.now()) ?? false)))
+                    Positioned(
+                      bottom: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(color: YoloColors.gold, borderRadius: BorderRadius.circular(9)),
+                        child: const Text('Recommended', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: YoloColors.onGold)),
+                      ),
+                    ),
                 ]),
               ),
             ),

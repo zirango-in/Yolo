@@ -190,7 +190,7 @@ void main() {
       await settle(tester);
       await closeTop();
       await settle(tester);
-      for (final label in ['Interactions', 'More features', 'Treasure boxes']) {
+      for (final label in ['Interactions', 'More features', 'Room details']) {
         current = 'room:$label';
         await tester.tap(find.bySemanticsLabel(label), warnIfMissed: false);
         await settle(tester);
@@ -198,9 +198,36 @@ void main() {
         await settle(tester);
       }
       current = 'room:user card';
-      await tester.tap(find.text('HOST'), warnIfMissed: false);
+      await tester.tap(find.bySemanticsLabel(RegExp('^Host ')), warnIfMissed: false);
       await settle(tester);
       await closeTop();
+      await settle(tester);
+      // Top drawer (dialog route) — close with its ••• button
+      current = 'room:drawer';
+      await tester.tap(find.byTooltip('Room menu'), warnIfMissed: false);
+      await settle(tester);
+      if (find.byTooltip('Close room menu').evaluate().isNotEmpty) {
+        await tester.tap(find.byTooltip('Close room menu'));
+        await settle(tester);
+      }
+      // Each room mode stage
+      final rc = c.read(roomProvider(rooms.first).notifier);
+      for (final m in ['acquaint', 'auction', 'video', 'game', 'normal']) {
+        current = 'room:mode $m';
+        rc.setRoomMode(m);
+        await settle(tester);
+      }
+      // Theme sheet
+      current = 'room:theme sheet';
+      await visit('/room/settings', extra: rooms.first);
+      if (find.text('Theme & background').evaluate().isNotEmpty) {
+        await tester.tap(find.text('Theme & background'));
+        await settle(tester);
+        await scrollAll();
+        await closeTop();
+        await settle(tester);
+      }
+      c.read(routerProvider).pop();
       await settle(tester);
       await visit('/room/settings', extra: rooms.first);
       await visit('/room/level', extra: rooms.first);

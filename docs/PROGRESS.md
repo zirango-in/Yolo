@@ -292,3 +292,31 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Room picture: no border; tidier header spacing.
 - Bottom bar: briefcase icon replaced with the four-colored four-dot button → grid of Red packet, Music,
   Settings (admins), Room info, Room level, Members, Invite, Ranking. Header ••• keeps Minimize, Report, Exit.
+
+## Voice room audit 3 (drawer, modes, themes, backgrounds, presence, performance)
+- ••• opens a drawer that slides down from the top (tap outside or ••• again to close):
+  5 room modes (Normal, Acquaint = host+partner, Auction, Video, Game), 4 categories (Friends/Music/Game/Chats
+  → room tag), Function of the room: Share, Gift Sound (personal toggle, crossed icon when off), Report Room,
+  Exit (leaves & disconnects), Settings, Recommendation Card (boosts room to top of Home for 30 min, cards per
+  room level), Rally Fans (notify members & fans, 30-min cooldown).
+- Mode stages: Auction (start item, coin bids, end → winner), Video (watch together via video_player, owner
+  picks a link, play/pause/stop), Game (start Mic Grab for the room; more games come with the Games step).
+- Themes FIXED: the gradient was laid out at zero size, so every theme looked the same dark colour. New
+  RoomLook (lib/data/room_look.dart) drives background, seat rings, panels, chat, buttons, menus, mini room.
+- Custom background: pick → full-screen preview with drag/slider crop → apply. Accent colours are taken from
+  the photo. Photo decoded at screen size (memory), cross-fade, never stretched. Remove photo → theme again.
+- Saved per room (roomSavedProvider) → restored on rejoin; sent to Laravel PATCH /rooms/{id}/settings;
+  POST /rooms/{id}/background (upload), POST /rooms/{id}/rally. applyRemoteSettings() is ready for the
+  realtime channel.
+- Enter / leave notices: fixed 30 px strip under the seats with a queue (not in chat anymore).
+- Header: no cover border, Level chip + Room ID, top-3 contributors with Charms (no rings/numbers/hearts),
+  live online count; Group chip only when no group is linked and you can link one (links in place).
+- Host/Partner labels removed (roles kept), symmetric spacing; music disc in its own corner; more space above
+  seats. Bottom bar: 36 px circles (44 px touch), input same height; white four-dot menu with Daily Treasure,
+  Red Packet, Music, Emotes, Gifting, Room Info, Room Level, Members, Invite, Ranking. Treasure button removed
+  from the room.
+- Room details: compact, Settings icon for everyone (permission checked), smaller Online/Members cards,
+  group link, announcement. Contribution list shows Charms; fake weekly/total multipliers removed.
+- Performance: room screen split into parts that watch only their own data (no full rebuild every second).
+- Needs backend: realtime sync to other devices (Laravel broadcasting/Reverb + a socket client), weekly/total
+  contribution history, rally push notifications, disk cache for remote background images.

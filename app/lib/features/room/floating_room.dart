@@ -183,9 +183,9 @@ class _FloatingRoomBubbleState extends ConsumerState<FloatingRoomBubble> {
               height: _h,
               padding: const EdgeInsets.fromLTRB(6, 6, 2, 6),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xF22A1460), Color(0xF2160C33)]),
+                gradient: LinearGradient(colors: [st.look.bg[1].withValues(alpha: 0.95), st.look.bg.last.withValues(alpha: 0.95)]),
                 borderRadius: BorderRadius.circular(_h / 2),
-                border: Border.all(color: YoloColors.gold.withValues(alpha: 0.6)),
+                border: Border.all(color: st.look.accent.withValues(alpha: 0.6)),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.45), blurRadius: 16, offset: const Offset(0, 6))],
               ),
               child: Row(

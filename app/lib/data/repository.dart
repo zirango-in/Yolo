@@ -10,6 +10,15 @@ abstract class YoloRepository {
   Future<YoloUser> login({required String method, String? phone, String? otp});
   Future<List<Room>> rooms({String tab = 'popular'});
   Future<List<Gift>> gifts();
+
+  /// Saves room-wide settings (theme, mode, category…). The server broadcasts them to the room.
+  Future<void> saveRoomSettings(int roomId, Map<String, Object?> settings);
+
+  /// Uploads a custom room background; returns its URL.
+  Future<String> uploadRoomBackground(int roomId, String filePath);
+
+  /// Sends a rally notification to the room's members and fans.
+  Future<void> rallyFans(int roomId, String message);
 }
 
 YoloRepository createRepository() =>
@@ -88,6 +97,15 @@ class DemoRepository implements YoloRepository {
 
   @override
   Future<List<Gift>> gifts() async => demoGiftCatalog;
+
+  @override
+  Future<void> saveRoomSettings(int roomId, Map<String, Object?> settings) async {}
+
+  @override
+  Future<String> uploadRoomBackground(int roomId, String filePath) async => filePath; // demo: the local file
+
+  @override
+  Future<void> rallyFans(int roomId, String message) async {}
 }
 
 // ---------------------------------------------------------------------------
@@ -137,6 +155,19 @@ class ApiRepository implements YoloRepository {
       );
     }).toList();
   }
+
+  @override
+  Future<void> saveRoomSettings(int roomId, Map<String, Object?> settings) => _data(_dio.patch('/rooms/$roomId/settings', data: settings));
+
+  @override
+  Future<String> uploadRoomBackground(int roomId, String filePath) async {
+    final form = FormData.fromMap({'image': await MultipartFile.fromFile(filePath)});
+    final data = await _data(_dio.post('/rooms/$roomId/background', data: form)) as Map<String, dynamic>;
+    return data['url'] as String;
+  }
+
+  @override
+  Future<void> rallyFans(int roomId, String message) => _data(_dio.post('/rooms/$roomId/rally', data: {'message': message}));
 
   @override
   Future<List<Gift>> gifts() async {

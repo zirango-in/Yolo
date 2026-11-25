@@ -71,9 +71,7 @@ void main() {
     expect(find.bySemanticsLabel('Send gift'), findsOneWidget);
     await tester.tap(find.byTooltip('Room menu'));
     await settle(tester);
-    await tester.tap(find.text('Exit'));
-    await settle(tester);
-    await tester.tap(find.text('Exit room'));
+    await tester.tap(find.bySemanticsLabel('Exit'));
     await settle(tester);
 
     // Families tab → open family profile
