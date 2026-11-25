@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "com.yolo.yolo"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler needs API 37+ to compile against (min/target SDK unchanged).
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
