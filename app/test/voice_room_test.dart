@@ -54,7 +54,7 @@ void main() {
     expect(find.text('Aria Night Club'), findsOneWidget);
     // Header: room image, Room ID, Level text; no Follow button on the main screen
     expect(find.text('Room ID: ${room.id}'), findsOneWidget);
-    expect(find.textContaining('Level '), findsWidgets);
+    expect(find.text(st().tag), findsWidgets); // current category word, no level prefix
     expect(find.text('Follow'), findsNothing);
     expect(find.bySemanticsLabel('Back'), findsNothing);
 

@@ -9,7 +9,6 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/theme.dart';
 import '../../data/models.dart';
 import '../../data/providers.dart';
-import '../../data/room_levels.dart';
 import '../../data/room_look.dart';
 import '../../data/settings_providers.dart';
 import '../../data/social_providers.dart';
@@ -222,17 +221,15 @@ class _Header extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final (name, cover, exp, locked, contributions, online, groupId) =
-        ref.watch(roomProvider(room).select((s) => (s.name, s.coverPath, s.exp, s.password.isNotEmpty, s.contributions, s.onlineCount, s.groupId)));
+    final (name, cover, tag, locked, contributions, online, groupId) =
+        ref.watch(roomProvider(room).select((s) => (s.name, s.coverPath, s.tag, s.password.isNotEmpty, s.contributions, s.onlineCount, s.groupId)));
     final ctrl = ref.read(roomProvider(room).notifier);
     final look = RoomLookScope.of(context);
-    final lvl = levelForExp(exp).level;
-    final levelColor = roomLevelColors(lvl).first;
     // Group chip: only while no group is linked, and only for people who can link one.
     final showGroup = groupId == null && ctrl.canManage;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 6, 2, 0),
+      padding: const EdgeInsets.fromLTRB(12, 6, 0, 0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
@@ -245,7 +242,7 @@ class _Header extends ConsumerWidget {
                 onTap: () => showRoomInfoSheet(context, ref, room),
                 child: Row(children: [
                   RoomCover(room: room, name: name, coverPath: cover, size: 44, radius: 12),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 6),
                   Flexible(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                       Row(mainAxisSize: MainAxisSize.min, children: [
@@ -255,8 +252,8 @@ class _Header extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                        decoration: BoxDecoration(color: levelColor.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(6)),
-                        child: Text('Level $lvl', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: levelColor, height: 1.2)),
+                        decoration: BoxDecoration(color: look.accent.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(6)),
+                        child: Text(tag, style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: look.accent, height: 1.2)),
                       ),
                       const SizedBox(height: 2),
                       Text('Room ID: ${room.id}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 8.5, color: Color(0xFFC4B8E6), height: 1.2)),
@@ -288,7 +285,7 @@ class _Header extends ConsumerWidget {
               ),
             ),
           ),
-          IconButton(tooltip: 'Room menu', visualDensity: VisualDensity.compact, padding: EdgeInsets.zero, constraints: const BoxConstraints(minWidth: 36, minHeight: 40), icon: const Icon(Icons.more_vert_rounded, size: 22), onPressed: onMenu),
+          IconButton(tooltip: 'Room menu', visualDensity: VisualDensity.compact, padding: EdgeInsets.zero, constraints: const BoxConstraints(minWidth: 30, minHeight: 40), icon: const Icon(Icons.more_vert_rounded, size: 22), onPressed: onMenu),
         ]),
         if (showGroup)
           Padding(
@@ -352,6 +349,7 @@ class _TopContributors extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (rows.isEmpty) return const SizedBox.shrink();
+    final look = RoomLookScope.of(context);
     return Semantics(
       button: true,
       excludeSemantics: true,
@@ -369,17 +367,21 @@ class _TopContributors extends StatelessWidget {
                 height: 34,
                 child: Stack(alignment: Alignment.topCenter, clipBehavior: Clip.none, children: [
                   YoloAvatar(user: u, size: 26, plain: true),
-                  // Transparent tag: just the number, with a soft shadow so it reads on every theme.
+                  // Number tag attached to the picture's bottom edge, on a soft blurred theme-colour glow.
                   Positioned(
                     bottom: 0,
-                    child: Text(
-                      compactCount(charms),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.w800,
-                        height: 1.1,
-                        shadows: [Shadow(color: Colors.black87, blurRadius: 3)],
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: look.accent.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(7),
+                        boxShadow: [BoxShadow(color: look.accent.withValues(alpha: 0.35), blurRadius: 6, spreadRadius: 1)],
+                      ),
+                      child: Text(
+                        compactCount(charms),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, height: 1.1, shadows: [Shadow(color: Colors.black54, blurRadius: 2)]),
                       ),
                     ),
                   ),
