@@ -377,11 +377,14 @@ class _BackpackScreenState extends ConsumerState<BackpackScreen> {
                 for (final e in gifts)
                   GlassCard(
                     padding: const EdgeInsets.all(8),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Icon(giftById(e.key).icon, color: giftById(e.key).tint, size: 36),
-                      Text(giftById(e.key).name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-                      Text('×${e.value}', style: const TextStyle(color: Color(0xFF86EFAC), fontWeight: FontWeight.w800)),
-                    ]),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(giftById(e.key).icon, color: giftById(e.key).tint, size: 36),
+                        Text(giftById(e.key).name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                        Text('×${e.value}', style: const TextStyle(color: Color(0xFF86EFAC), fontWeight: FontWeight.w800)),
+                      ]),
+                    ),
                   ),
               ],
             );

@@ -219,3 +219,11 @@ Read this first when starting a new session: it says exactly where we stopped.
 2. Laravel + MySQL backend and connecting the app (switch AppConfig.useDemoData), Agora voice,
    SMS OTP, Google Play Billing, FCM push, file uploads.
 3. Admin panel. 4. Translations (ARB files). 5. Release build (signing, Play Store listing).
+
+## Layout fix pass (overflows)
+- New audit `app/test/tools/overflow_audit_test.dart`: renders ~70 screens + room sheets with a real font
+  (Roboto from the Flutter SDK, text ×1.1; also run with `--dart-define=AUDIT_SCALE=1.3`) on 360×640 and
+  390×844, scrolls each page and fails on any overflow. Skips automatically if the font file is missing.
+- Fixed: wallet recharge cards, family feature grid, voice-room seat menu (now scrolls on short phones),
+  login screen (scrolls on short phones / large text), backpack gift tiles, bug-report screenshot row.
+- Result: 0 overflows at 1.1× and 1.3× text on both sizes; all 20 tests passing.

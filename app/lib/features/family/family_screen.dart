@@ -185,7 +185,11 @@ class _MyFamily extends ConsumerWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Column(children: [TintIcon(icon, color: color, size: 46), const SizedBox(height: 6), Text(label, style: const TextStyle(fontSize: 12))]),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              TintIcon(icon, color: color, size: 46),
+              const SizedBox(height: 6),
+              Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+            ]),
           ),
         );
 
@@ -296,6 +300,7 @@ class _MyFamily extends ConsumerWidget {
           crossAxisCount: 4,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 0.82,
           children: [
             feature(Icons.mic_rounded, 'Voice room', const Color(0xFFF5C451), () => context.push('/room', extra: familyRoom(family))),
             feature(Icons.task_alt_rounded, 'Quests', const Color(0xFF86EFAC), () => context.push('/family/quests')),

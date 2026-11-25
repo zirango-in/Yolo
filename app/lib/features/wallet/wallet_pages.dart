@@ -167,14 +167,16 @@ class WalletScreen extends ConsumerWidget {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
-          childAspectRatio: 0.85,
+          childAspectRatio: 0.78,
           children: [
             for (final p in rechargePackages)
               GlassCard(
                 padding: const EdgeInsets.all(8),
                 border: p.popular ? YoloColors.gold : null,
                 onTap: () => _buy(context, ref, p),
-                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
                   if (p.popular) const Badge2('HOT', bg: Color(0xFFEF4444), fg: Colors.white),
                   const SizedBox(height: 4),
                   const CoinIcon(size: 26),
@@ -183,7 +185,8 @@ class WalletScreen extends ConsumerWidget {
                   if (p.bonus > 0) Text('+${formatCoins(p.bonus)}', style: const TextStyle(fontSize: 11, color: Color(0xFF86EFAC))),
                   const SizedBox(height: 4),
                   Text(p.price, style: const TextStyle(fontWeight: FontWeight.w700)),
-                ]),
+                  ]),
+                ),
               ),
           ],
         ),

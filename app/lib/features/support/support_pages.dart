@@ -331,7 +331,7 @@ class _BugReportScreenState extends ConsumerState<BugReportScreen> {
             else
               const Icon(Icons.add_photo_alternate_rounded, color: YoloColors.gold, size: 32),
             const SizedBox(width: 12),
-            Text(_shot == null ? 'Attach a screenshot (optional)' : 'Screenshot attached'),
+            Expanded(child: Text(_shot == null ? 'Attach a screenshot (optional)' : 'Screenshot attached')),
           ]),
         ),
         SwitchListTile(

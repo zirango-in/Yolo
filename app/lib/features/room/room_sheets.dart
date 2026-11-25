@@ -41,7 +41,8 @@ void showSeatActions(BuildContext context, WidgetRef ref, Room room, Seat seat, 
       if (toast != null) showYoloToast(context, toast);
     }
 
-    return Column(mainAxisSize: MainAxisSize.min, children: [
+    // Scrolls on short phones so every action stays reachable.
+    return SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
       if (u != null)
         ListTile(
           contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
@@ -94,7 +95,7 @@ void showSeatActions(BuildContext context, WidgetRef ref, Room room, Seat seat, 
         ],
       ],
       const SizedBox(height: 8),
-    ]);
+    ]));
   });
 }
 

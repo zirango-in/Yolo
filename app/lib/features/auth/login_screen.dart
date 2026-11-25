@@ -44,7 +44,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
+          // Fills the screen on normal phones; scrolls on short phones or with large text.
+          child: LayoutBuilder(
+            builder: (context, box) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: box.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
             padding: const EdgeInsets.fromLTRB(28, 0, 28, 24),
             child: Column(children: [
               const Spacer(flex: 3),
@@ -125,6 +131,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const Text('By continuing you agree to our Terms and Privacy Policy',
                   textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: YoloColors.textMuted)),
             ]),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
