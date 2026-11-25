@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yolo Profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#F5C451}a:hover{color:#FFD97A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0D0820; color: #F4F0FF; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; position: relative; overflow: hidden">
+  <div style="height: 210px; background: linear-gradient(160deg, #5B21B6 0%, #9D174D 100%); position: relative" aria-hidden="true">
+    <div style="position: absolute; inset: 0; background: radial-gradient(80% 90% at 80% 10%, rgba(245,196,81,0.35), rgba(245,196,81,0) 60%)"></div>
+  </div>
+
+  <div style="margin-top: -70px; padding: 0 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative">
+    <div style="width: 116px; height: 116px; border-radius: 58px; padding: 5px; box-sizing: border-box; background: conic-gradient(#F5C451, #FFF3CC, #E0A82E, #FFF3CC, #F5C451); box-shadow: 0 0 34px rgba(245,196,81,0.5)">
+      <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg,#EC4899,#8B5CF6); border: 4px solid #0D0820; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800">A</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px">
+      <div style="font-size: 22px; font-weight: 800">Aria</div>
+      <span style="font-size: 11px; font-weight: 800; color: #1A1200; background: linear-gradient(135deg,#FFD97A,#E0A82E); padding: 2px 8px; border-radius: 8px">VIP 5</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #A79BC7">
+      <span>ID 1048576</span>
+      <span style="padding: 2px 8px; border-radius: 8px; background: rgba(236,72,153,0.18); color: #F9A8D4; font-weight: 700">♀ 22</span>
+      <span style="padding: 2px 8px; border-radius: 8px; background: rgba(139,92,246,0.2); color: #C4B5FD; font-weight: 700">Lv 28</span>
+    </div>
+    <div style="font-size: 13px; color: #D9D0F2">Night owl. Music, Ludo and good vibes.</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 18px 20px 0; padding: 14px 0; border-radius: 18px; background: #1A1233; border: 1px solid rgba(255,255,255,0.06)">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px"><div style="font-size: 18px; font-weight: 800">312</div><div style="font-size: 12px; color: #A79BC7">Following</div></div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; border-left: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06)"><div style="font-size: 18px; font-weight: 800">8.4K</div><div style="font-size: 12px; color: #A79BC7">Followers</div></div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px"><div style="font-size: 18px; font-weight: 800">96</div><div style="font-size: 12px; color: #A79BC7">Friends</div></div>
+  </div>
+
+  <a href="#" style="margin: 14px 20px 0; padding: 14px 16px; border-radius: 18px; background: linear-gradient(120deg, #2A1A05, #4A3410); border: 1px solid rgba(245,196,81,0.45); display: flex; align-items: center; gap: 12px; text-decoration: none; color: #F4F0FF">
+    <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 24l12 10 12-20 12 20 12-10-6 28H14z" fill="#F5C451"></path></svg>
+    <div style="flex: 1; display: flex; flex-direction: column">
+      <div style="font-size: 15px; font-weight: 800; color: #FDE7A8">VIP Center</div>
+      <div style="font-size: 12px; color: #E9D8A6">Frames, entry effects and exclusive gifts</div>
+    </div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5C451" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+  </a>
+
+  <div style="margin: 14px 20px 0; border-radius: 18px; background: #1A1233; border: 1px solid rgba(255,255,255,0.06); overflow: hidden">
+    <sc-for list="{{menu}}" as="i" hint-placeholder-count="5">
+      <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; text-decoration: none; color: #F4F0FF; border-bottom: 1px solid rgba(255,255,255,0.05)">
+        <span style="width: 34px; height: 34px; border-radius: 11px; background: {{i.tint}}; color: {{i.ink}}; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800">{{i.glyph}}</span>
+        <span style="flex: 1; font-size: 14px; font-weight: 600">{{i.label}}</span>
+        <span style="font-size: 13px; color: #F5C451; font-weight: 700">{{i.value}}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A79BC7" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+      </a>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      menu: [
+        { label: 'Wallet', value: '12,480', glyph: 'W', tint: 'rgba(245,196,81,0.18)', ink: '#F5C451' },
+        { label: 'Store', value: '', glyph: 'S', tint: 'rgba(236,72,153,0.18)', ink: '#F9A8D4' },
+        { label: 'Backpack', value: '', glyph: 'B', tint: 'rgba(56,189,248,0.18)', ink: '#7DD3FC' },
+        { label: 'My Family', value: 'Moonlight', glyph: 'F', tint: 'rgba(139,92,246,0.2)', ink: '#C4B5FD' },
+        { label: 'Settings', value: '', glyph: 'S', tint: 'rgba(255,255,255,0.08)', ink: '#D9D0F2' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
