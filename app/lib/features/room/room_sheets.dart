@@ -85,7 +85,10 @@ void showSeatActions(BuildContext context, WidgetRef ref, Room room, Seat seat, 
             ListTile(
               leading: const Icon(Icons.admin_panel_settings_rounded),
               title: Text(state.admins.contains(u.id) ? 'Remove admin' : 'Make admin'),
-              onTap: () => act(() => ctrl.toggleAdmin(u)),
+              onTap: () => act(() {
+                final err = ctrl.toggleAdmin(u);
+                if (err.isNotEmpty) showYoloToast(context, err);
+              }),
             ),
           ListTile(
             leading: const Icon(Icons.block_rounded, color: Color(0xFFF87171)),
@@ -96,141 +99,6 @@ void showSeatActions(BuildContext context, WidgetRef ref, Room room, Seat seat, 
       ],
       const SizedBox(height: 8),
     ]));
-  });
-}
-
-/// Room settings (owner / admins).
-void showRoomSettings(BuildContext context, WidgetRef ref, Room room) {
-  final st = ref.read(roomProvider(room));
-  final name = TextEditingController(text: st.name);
-  final ann = TextEditingController(text: st.announcement);
-  final pass = TextEditingController(text: st.password);
-  var theme = st.theme;
-  var apply = st.applyMode;
-  var locked = st.password.isNotEmpty;
-
-  showRoomSheet<void>(
-    context,
-    (c) => StatefulBuilder(
-      builder: (c, setState) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(c).bottom),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Room settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 14),
-            TextField(controller: name, maxLength: 30, decoration: const InputDecoration(labelText: 'Room name')),
-            TextField(controller: ann, maxLength: 120, maxLines: 2, decoration: const InputDecoration(labelText: 'Announcement')),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Lock room with password'),
-              value: locked,
-              activeThumbColor: YoloColors.gold,
-              onChanged: (v) => setState(() => locked = v),
-            ),
-            if (locked)
-              TextField(
-                controller: pass,
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: 'Password (4–6 digits)'),
-              ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Mic requests'),
-              subtitle: const Text('Users must ask before taking a seat', style: TextStyle(fontSize: 12)),
-              value: apply,
-              activeThumbColor: YoloColors.gold,
-              onChanged: (v) => setState(() => apply = v),
-            ),
-            const SizedBox(height: 6),
-            const Text('Room theme', style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 70,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: RoomState.themes.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 10),
-                itemBuilder: (_, i) => Semantics(
-                  button: true,
-                  selected: theme == i,
-                  label: RoomState.themeNames[i],
-                  child: GestureDetector(
-                    onTap: () => setState(() => theme = i),
-                    child: Container(
-                      width: 90,
-                      alignment: Alignment.bottomLeft,
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        gradient: LinearGradient(colors: RoomState.themes[i], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                        border: Border.all(color: theme == i ? YoloColors.gold : Colors.white12, width: theme == i ? 2.5 : 1),
-                      ),
-                      child: Text(RoomState.themeNames[i], style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            GoldButton(
-              label: 'Save settings',
-              onPressed: () {
-                if (name.text.trim().length < 2) return;
-                if (locked && pass.text.length < 4) {
-                  showYoloToast(context, 'Password must be 4–6 digits');
-                  return;
-                }
-                ref.read(roomProvider(room).notifier).updateSettings(
-                      name: name.text.trim(),
-                      announcement: ann.text.trim(),
-                      password: locked ? pass.text : '',
-                      theme: theme,
-                      applyMode: apply,
-                    );
-                Navigator.pop(c);
-              },
-            ),
-          ]),
-        ),
-      ),
-    ),
-    scroll: true,
-  );
-}
-
-/// Online members with roles.
-void showMembersSheet(BuildContext context, WidgetRef ref, Room room) {
-  showRoomSheet<void>(context, (c) {
-    final st = ref.read(roomProvider(room));
-    final me = ref.read(sessionProvider)!;
-    final users = <YoloUser>{room.owner, me, ...st.seats.where((s) => s.user != null).map((s) => s.user!), ...demoAllUsers}
-        .where((u) => !st.banned.contains(u.id))
-        .toList();
-    String role(YoloUser u) => u.id == room.owner.id ? 'Owner' : (st.admins.contains(u.id) ? 'Admin' : (st.seats.any((s) => s.user?.id == u.id) ? 'On mic' : 'Listener'));
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.6),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _sheetTitle('Online · ${users.length}'),
-        Flexible(
-          child: ListView(shrinkWrap: true, children: [
-            for (final u in users)
-              ListTile(
-                leading: YoloAvatar(user: u, size: 42),
-                title: Text(u.id == me.id ? '${u.name} (you)' : u.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                trailing: Badge2(role(u),
-                    bg: role(u) == 'Owner' ? YoloColors.gold : const Color(0x22FFFFFF), fg: role(u) == 'Owner' ? YoloColors.onGold : YoloColors.textSoft),
-                onTap: () {
-                  Navigator.pop(c);
-                  if (u.id != me.id) context.push('/user', extra: u);
-                },
-              ),
-          ]),
-        ),
-      ]),
-    );
   });
 }
 

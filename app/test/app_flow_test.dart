@@ -64,7 +64,7 @@ void main() {
     // Chat
     await tester.enterText(find.byType(TextField), 'Hello Yolo');
     await tester.tap(find.byTooltip('Send'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await settle(tester); // let the chat scroll to the new message
     expect(find.textContaining('Hello Yolo'), findsOneWidget);
 
     // Send a Crown (520 coins)

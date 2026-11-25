@@ -36,6 +36,7 @@ import 'features/profile/level_badges_screens.dart';
 import 'features/profile/user_profile_screen.dart';
 import 'features/rankings/rankings_screen.dart';
 import 'features/room/create_room_screen.dart';
+import 'features/room/room_pages.dart';
 import 'features/room/room_screen.dart';
 import 'features/settings/settings_pages.dart';
 import 'features/settings/settings_screen.dart';
@@ -84,6 +85,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
       GoRoute(path: '/room', builder: (_, state) => RoomScreen(room: state.extra! as Room)),
       GoRoute(path: '/room/create', builder: (_, _) => const CreateRoomScreen()),
+      GoRoute(path: '/room/settings', builder: (_, state) => RoomSettingsScreen(room: state.extra! as Room)),
+      GoRoute(path: '/room/level', builder: (_, state) => RoomLevelScreen(room: state.extra! as Room)),
       GoRoute(path: '/rankings', builder: (_, state) => RankingsScreen(initialTab: state.extra as int? ?? 0)),
       GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen()),
       GoRoute(path: '/games', builder: (_, _) => const GameCenterScreen()),

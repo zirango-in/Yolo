@@ -124,12 +124,14 @@ class RoomMessage {
   final String sender;
   final String text;
   final Color color;
+  final int senderId; // used for chat badges (role, level, member title)
 
   const RoomMessage({
     required this.kind,
     required this.text,
     this.sender = '',
     this.color = const Color(0xFFC4B5FD),
+    this.senderId = 0,
   });
 }
 

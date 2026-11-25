@@ -227,3 +227,32 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Fixed: wallet recharge cards, family feature grid, voice-room seat menu (now scrolls on short phones),
   login screen (scrolls on short phones / large text), backpack gift tiles, bug-report screenshot row.
 - Result: 0 overflows at 1.1× and 1.3× text on both sizes; all 20 tests passing.
+
+## Voice room upgrade (from owner's 15 reference screenshots)
+- Room level & EXP (`lib/data/room_levels.dart`): 9 levels with EXP, max members, admins, co-owners, promo
+  cards, background unlocks (Club Lv2, Golden Party Lv3, Diamond Party Lv4, Starfield Lv6, Future City Lv8),
+  guest seat Lv7. EXP: 5 per 5 min in room (×2 VIP), 1 per chat, 10 coins gifted = 1 EXP.
+  Room level page: badge + progress, Tasks today, Level explanation table.
+- Header: level badge, name, tag, ID, orange Join button (membership, optional fee), online avatar + count,
+  menu; Group chip (associated group chat).
+- Room info sheet: cover photo, tags (Advanced from Lv5), copy ID, level card, owner/co-owner/admin row,
+  Online / Members cards, fans, nation, max members, announcement, settings + share.
+- Members sheet: Online / Members / Contribution (Daily/Weekly/Total, my rank pinned), search by name or ID,
+  roles, level crown, "Active X ago", manage menu (set co-owner x/limit, set/remove admin, remove member).
+- Full Room settings page (`/room/settings`): title, cover, announcement, mode (normal / intimacy seat), tag,
+  background (level-locked), mic mode, high quality, ban text chat (enforced), no images, ban red packet
+  (enforced), password, manage events, membership fee, co-owner/admin/blacklist (unban) lists, records log,
+  associated group, room ID.
+- Animated room backgrounds (floating light + twinkling sparkles; respects reduce motion).
+- Intimacy seat mode: host + partner seat with heartbeat line, system message when switched.
+- User card (tap a person): avatar banner with CP, role, level crown, member title, ID copy, Mention / Profile / Gift.
+- Chat lines with avatar, role icon, name, level crown, member title badge; styled system messages.
+- Interaction panel (emoji button): lottery, rock-paper-scissors, dice, light burst, coin toss + 13 stickers,
+  result bubble on your seat + chat line.
+- Red packets (tools): 100–5,000 coins split into 5/10/20 random shares, floating envelope, open & grab,
+  grabbed list; bots grab in demo.
+- Treasure boxes: 6 boxes by minutes in room (2 VIP-only), each task (join, gift, message) cuts 1 minute.
+- New bottom bar: speaker, mic (takes a free seat if not on mic), Type…, interactions, gift, tools, more.
+- Entry banner pill + now-playing music pill.
+- Layout audit extended to all new room screens: 0 overflows (360×640 and 390×844, text ×1.1 and ×1.3).
+- Tests: rewritten `test/voice_room_test.dart` covers all of the above; all 20 tests passing.

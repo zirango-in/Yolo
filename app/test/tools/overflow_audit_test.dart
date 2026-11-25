@@ -83,6 +83,17 @@ void main() {
       await settle(tester);
       final rooms = await roomsF;
 
+      Future<void> closeTop() async {
+        for (final type in [BottomSheet, Dialog, AlertDialog]) {
+          final f = find.byType(type);
+          if (f.evaluate().isNotEmpty) {
+            Navigator.of(tester.element(f.last)).pop();
+            await settle(tester, 6);
+            return;
+          }
+        }
+      }
+
       Future<void> scrollAll() async {
         for (var i = 0; i < 6; i++) {
           final scrollables = find.byType(Scrollable);
@@ -167,6 +178,30 @@ void main() {
       await settle(tester);
       await tester.tapAt(const Offset(20, 60));
       await settle(tester);
+      current = 'room:info';
+      await tester.tap(find.text(rooms.first.name).first, warnIfMissed: false);
+      await settle(tester);
+      await closeTop();
+      await settle(tester);
+      current = 'room:members';
+      await tester.tap(find.bySemanticsLabel('Online users'), warnIfMissed: false);
+      await settle(tester);
+      await closeTop();
+      await settle(tester);
+      for (final label in ['Interactions', 'Room tools', 'Treasure boxes']) {
+        current = 'room:$label';
+        await tester.tap(find.bySemanticsLabel(label), warnIfMissed: false);
+        await settle(tester);
+        await closeTop();
+        await settle(tester);
+      }
+      current = 'room:user card';
+      await tester.tap(find.text('HOST'), warnIfMissed: false);
+      await settle(tester);
+      await closeTop();
+      await settle(tester);
+      await visit('/room/settings', extra: rooms.first);
+      await visit('/room/level', extra: rooms.first);
       // 12-seat private room
       await visit('/room', extra: rooms.last, scroll: false);
 
