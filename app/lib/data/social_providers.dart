@@ -11,7 +11,6 @@ final likedMomentsProvider = NotifierProvider<SetController, Set<int>>(() => Set
 final readNotificationsProvider = NotifierProvider<SetController, Set<int>>(() => SetController({}));
 final ownedItemsProvider = NotifierProvider<SetController, Set<int>>(() => SetController({2}));
 final equippedItemsProvider = NotifierProvider<SetController, Set<int>>(() => SetController({}));
-final joinedFamilyProvider = NotifierProvider<FamilyController, int?>(FamilyController.new);
 
 class SetController extends Notifier<Set<int>> {
   SetController(this._initial);
@@ -24,13 +23,6 @@ class SetController extends Notifier<Set<int>> {
   void add(int id) => state = {...state, id};
   void remove(int id) => state = {...state}..remove(id);
   void addAll(Iterable<int> ids) => state = {...state, ...ids};
-}
-
-class FamilyController extends Notifier<int?> {
-  @override
-  int? build() => null;
-  void join(int id) => state = id;
-  void leave() => state = null;
 }
 
 final followersProvider = NotifierProvider<SetController, Set<int>>(() => SetController({2001, 2002, 2003}));

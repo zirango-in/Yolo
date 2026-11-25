@@ -79,17 +79,9 @@ void main() {
     expect(container.read(ownedItemsProvider).contains(1), isTrue);
     await back();
 
-    // Family: join a family, then leave it.
+    // Family page opens (full family flows are in family_test.dart).
     await open('/family', 'Family');
-    await tester.tap(find.text('Join').first);
-    await settle(tester);
-    expect(container.read(joinedFamilyProvider), isNotNull);
-    expect(find.text('Members'), findsOneWidget);
-    await tester.ensureVisible(find.text('Leave family'));
-    await settle(tester);
-    await tester.tap(find.text('Leave family'));
-    await settle(tester);
-    expect(container.read(joinedFamilyProvider), isNull);
+    expect(find.text('Create your family'), findsOneWidget);
     await back();
 
     // Notifications: read all.

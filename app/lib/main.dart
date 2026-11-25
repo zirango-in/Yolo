@@ -16,6 +16,7 @@ import 'features/auth/welcome_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/discover/discover_screen.dart';
 import 'features/events/events_screen.dart';
+import 'features/family/family_pages.dart';
 import 'features/family/family_screen.dart';
 import 'features/friends/friends_screen.dart';
 import 'features/games/game_center_screen.dart';
@@ -90,6 +91,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/moments/post', builder: (_, state) => PostDetailsScreen(moment: state.extra! as Moment)),
       GoRoute(path: '/moments/topic', builder: (_, state) => MomentsScreen(topic: state.extra as String?)),
       GoRoute(path: '/family', builder: (_, _) => const FamilyScreen()),
+      GoRoute(path: '/family/create', builder: (_, _) => const CreateFamilyScreen()),
+      GoRoute(path: '/family/profile', builder: (_, state) => FamilyProfileScreen(family: state.extra! as FamilyInfo)),
+      GoRoute(path: '/family/quests', builder: (_, _) => const FamilyQuestsScreen()),
+      GoRoute(path: '/family/gacha', builder: (_, _) => const FamilyGachaScreen()),
+      GoRoute(path: '/family/shop', builder: (_, _) => const FamilyShopScreen()),
+      GoRoute(path: '/family/members', builder: (_, _) => const FamilyMembersScreen()),
+      GoRoute(path: '/family/ranking', builder: (_, _) => const FamilyRankingScreen()),
       GoRoute(path: '/events', builder: (_, _) => const EventsScreen()),
       GoRoute(path: '/shop', builder: (_, _) => const ShopScreen()),
       GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),

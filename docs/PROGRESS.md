@@ -106,7 +106,17 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Video playback is a placeholder card for now (needs video_player + Laravel upload).
 - Tests: `test/moments_test.dart`; all 8 tests passing.
 
-## NEXT: Step 7 — Family
-Create family, search, profile, roles (leader/deputy/admin), level, funds/coins, quests, donations,
-activeness, gacha/daily free roll, chests, rewards, family shop, title, frame, sign-in, rankings,
-upgrade, leave.
+## Step 7 done — Family
+- Not in a family: create card (5,000 coins), search by name/ID, recommended list → family profile → Join.
+- My family: badge, name, slogan, level, my role, title; funds / my family coins / activeness;
+  level progress; Sign in (+10 activeness, +20 FC); Donate 100/500/1,000 coins (funds + activeness + FC);
+  Upgrade (leader/deputy, costs level × 5,000 funds).
+- Feature grid: Voice room (family room), Quests & chests (5 daily quests, 3 activeness chests),
+  Lucky roll (daily free roll, then 30 FC; animated board), Family shop (titles + frames with FC),
+  Members (roles; leader/deputy can promote/demote/remove), Ranking (weekly by activeness), Leave/Disband.
+- Data in `lib/data/family_providers.dart` (Laravel endpoints listed at the top).
+- Tests: `test/family_test.dart`; all 9 tests passing.
+
+## NEXT: Step 8 — Gifts & virtual items
+Gift store, receive gifts, gift categories, special gifts, gift history, my gifts, gift rankings,
+avatar items, frames, decorations, special effects.

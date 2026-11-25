@@ -72,12 +72,12 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] User Posts · Post Details · Delete Post · Report Post
 
 ## Step 7 — Family
-- [ ] Family Home · Create · Join · Search · Profile · Members
-- [ ] Leader · Deputy · Admin · Roles
-- [ ] Level · Funds · Coins · Quests · Donations · Activeness
-- [ ] Gacha · Daily Free Roll · Chests · Rewards · Family Shop
-- [ ] Family Voice Room · Title · Avatar Frame · Sign-in
-- [ ] Rankings · Upgrade · Leave Family
+- [x] Family Home · Create · Join · Search · Profile · Members
+- [x] Leader · Deputy · Admin · Roles
+- [x] Level · Funds · Coins · Quests · Donations · Activeness
+- [x] Gacha · Daily Free Roll · Chests · Rewards · Family Shop
+- [x] Family Voice Room · Title · Avatar Frame · Sign-in
+- [x] Rankings · Upgrade · Leave Family
 
 ## Step 8 — Gifts & Virtual Items
 - [ ] Gift Store · Send · Receive · Categories · Animations · Special Gifts
