@@ -71,7 +71,19 @@ Read this first when starting a new session: it says exactly where we stopped.
 - Owner tests in Android Studio on a physical phone from `~/Documents/Yolo` (git clone of this repo, `git pull` to update).
 - Explain things simply; stop immediately when the owner says stop/wait.
 
-## NEXT: Step 4 — Voice room features
-Admin management, room settings (name, announcement, password, lock/unlock, background/theme),
-room music, members list, invite friends, room ranking, speaker controls, report room, family voice room,
-create room / private room flow.
+## Step 4 done — Voice rooms
+- Create room (+ button): name, announcement, category, cover, 8/12 seats, private with password.
+- Private rooms ask for the password (demo: "VIP Lounge", password 1234); lock icon on cards.
+- Seat menu: take seat, lock/unlock, invite to seat; on users: profile, gift, leave mic,
+  mute/unmute, remove from mic, make/remove admin (owner), ban. Mute and admin badges on seats.
+- Room menu: Settings (name, announcement, password lock, mic-request mode, 6 themes), Music
+  (6 placeholder tracks, play/pause, now-playing chip), Members (roles), Invite (friends + copy link),
+  Ranking (gift contributions), Details, Report (reasons), Exit (minimize / exit; back button asks).
+- Speaker on/off, mic on/off, room games button (games come later), family voice room from Family page.
+- Fixed: invite button layout bug; toasts no longer cover bottom controls.
+- Real live voice still needs Agora + Laravel token endpoint.
+- Tests: `test/voice_room_test.dart`; all 6 tests passing.
+
+## NEXT: Step 5 — Friends & chat
+Friend requests, add friends, search by Yolo ID, mutual friends, group chat, chat history,
+voice messages, image sharing, online status, block list, report user.

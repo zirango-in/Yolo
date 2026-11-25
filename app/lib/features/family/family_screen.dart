@@ -3,8 +3,12 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
 import '../../data/demo_content.dart';
+import '../../data/models.dart';
+import '../../data/repository.dart';
 import '../../data/social_providers.dart';
 import '../../widgets/common.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../widgets/page_kit.dart';
 
 /// Family page: shows my family (if joined) or the list of families to join.
@@ -104,7 +108,19 @@ class _MyFamily extends ConsumerWidget {
     Widget feature(IconData icon, String label, Color color) => Expanded(
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
-            onTap: () => showYoloToast(context, '$label arrives in Step 7'),
+            onTap: () => label == 'Voice room'
+                ? context.push('/room',
+                    extra: Room(
+                      id: 700000 + family.id,
+                      name: '${family.name} Family Room',
+                      tag: 'Family',
+                      owner: DemoUsers.omar,
+                      online: 12,
+                      cover: family.colors,
+                      isFamily: true,
+                      announcement: 'Family members only. Daily sign-in at 9pm!',
+                    ))
+                : showYoloToast(context, '$label arrives in Step 7'),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Column(children: [TintIcon(icon, color: color, size: 46), const SizedBox(height: 6), Text(label, style: const TextStyle(fontSize: 12))]),

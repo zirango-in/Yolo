@@ -61,6 +61,8 @@ class DemoRepository implements YoloRepository {
           cover: [Color(0xFFA855F7), Color(0xFFEC4899)]),
       Room(id: 884221, name: 'Who is the Spy?', tag: 'Games', online: 37, owner: DemoUsers.leo,
           cover: [Color(0xFFEF4444), Color(0xFF7C3AED)]),
+      Room(id: 884222, name: 'VIP Lounge', tag: 'Private', online: 9, owner: DemoUsers.zara, password: '1234',
+          cover: [Color(0xFF111827), Color(0xFFB45309)], seatCount: 12),
     ];
   }
 

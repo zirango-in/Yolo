@@ -49,14 +49,14 @@ Naming: "WePlay UID" → **Yolo ID**. WePlay-original games get Yolo's own versi
 - [x] User Posts / Moments · Follow / Friend info
 
 ## Step 4 — Voice Rooms
-- [ ] Room List · Public Room · Private Room · Create Room · Join Room · Room Details
-- [ ] Owner / Host · Admin Management
-- [ ] Mic Seats · Join Mic · Leave Mic · Mic On / Off · Speaker Controls
-- [ ] Room Chat · Room Members · Invite Friends
-- [ ] Room Background · Room Theme · Room Music
-- [ ] Room Games · Room Gifts · Gift Animations · Room Rankings
-- [ ] Room Settings · Password · Announcement · Lock / Unlock · Exit · Report Room
-- [ ] Family Voice Room
+- [x] Room List · Public Room · Private Room · Create Room · Join Room · Room Details
+- [x] Owner / Host · Admin Management
+- [x] Mic Seats · Join Mic · Leave Mic · Mic On / Off · Speaker Controls
+- [x] Room Chat · Room Members · Invite Friends
+- [x] Room Background · Room Theme · Room Music
+- [x] Room Games · Room Gifts · Gift Animations · Room Rankings
+- [x] Room Settings · Password · Announcement · Lock / Unlock · Exit · Report Room
+- [x] Family Voice Room
 - [ ] [api] Real live voice (Agora)
 
 ## Step 5 — Friends & Chat

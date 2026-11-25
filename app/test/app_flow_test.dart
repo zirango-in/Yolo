@@ -50,12 +50,15 @@ void main() {
     await tester.tap(find.text('Late Night Talks'));
     await settle(tester);
     await settle(tester);
-    expect(find.text('Seat 4'), findsOneWidget);
+    expect(find.bySemanticsLabel('Take seat 4'), findsOneWidget);
 
     // Take an empty seat
-    await tester.tap(find.text('Seat 4'));
+    // Aria owns this room, so tapping an empty seat opens the seat menu.
+    await tester.tap(find.bySemanticsLabel('Take seat 4'));
+    await settle(tester);
+    await tester.tap(find.text('Take this seat'));
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text('Seat 4'), findsNothing);
+    expect(find.bySemanticsLabel('Take seat 4'), findsNothing);
     expect(find.byTooltip('Send'), findsOneWidget);
 
     // Chat

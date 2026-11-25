@@ -71,6 +71,9 @@ class Room {
   final int online;
   final YoloUser owner;
   final List<Color> cover;
+  final String password; // empty = public room
+  final int seatCount; // 8 or 12
+  final bool isFamily;
 
   const Room({
     required this.id,
@@ -80,7 +83,12 @@ class Room {
     this.announcement = '',
     this.online = 0,
     this.cover = const [Color(0xFF7C3AED), Color(0xFFDB2777)],
+    this.password = '',
+    this.seatCount = 8,
+    this.isFamily = false,
   });
+
+  bool get isPrivate => password.isNotEmpty;
 }
 
 class Seat {

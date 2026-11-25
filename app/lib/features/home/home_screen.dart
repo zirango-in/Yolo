@@ -10,6 +10,7 @@ import '../../widgets/common.dart';
 import '../games/game_center_screen.dart';
 import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
+import '../room/room_sheets.dart';
 
 /// Main shell with the premium bottom navigation.
 class HomeShell extends ConsumerStatefulWidget {
@@ -22,12 +23,7 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _tab = 0;
 
-  Future<void> _openMyRoom() async {
-    final rooms = await ref.read(roomsProvider('popular').future);
-    final me = ref.read(sessionProvider);
-    final mine = rooms.firstWhere((r) => r.owner.id == me?.id, orElse: () => rooms.first);
-    if (mounted) context.push('/room', extra: mine);
-  }
+  void _openMyRoom() => context.push('/room/create');
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +126,7 @@ class _RoomsTabState extends ConsumerState<_RoomsTab> {
   @override
   Widget build(BuildContext context) {
     final me = ref.watch(sessionProvider);
-    final rooms = ref.watch(roomsProvider(_tabs[_tab].toLowerCase()));
+    final rooms = ref.watch(roomsProvider(_tabs[_tab].toLowerCase())).whenData((l) => [...ref.watch(createdRoomsProvider), ...l]);
 
     return Stack(children: [
       Positioned(
@@ -318,18 +314,18 @@ class _EventBanner extends StatelessWidget {
       );
 }
 
-class _RoomCard extends StatelessWidget {
+class _RoomCard extends ConsumerWidget {
   const _RoomCard({required this.room});
   final Room room;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Material(
       color: YoloColors.surface,
       borderRadius: BorderRadius.circular(20),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push('/room', extra: room),
+        onTap: () => openRoom(context, ref, room),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
             child: Hero(
@@ -361,6 +357,8 @@ class _RoomCard extends StatelessWidget {
                       ]),
                     ),
                   ),
+                  if (room.isPrivate)
+                    const Positioned(top: 8, right: 8, child: Icon(Icons.lock_rounded, size: 18, color: YoloColors.gold)),
                 ]),
               ),
             ),

@@ -195,6 +195,8 @@ void showYoloToast(BuildContext context, String msg) {
     ..showSnackBar(SnackBar(
       content: Text(msg),
       behavior: SnackBarBehavior.floating,
+      // Float above bottom bars (room controls, nav) so buttons stay tappable.
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 90),
       backgroundColor: YoloColors.surface,
       duration: const Duration(milliseconds: 1400),
     ));

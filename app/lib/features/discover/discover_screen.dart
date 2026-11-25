@@ -8,6 +8,7 @@ import '../../data/providers.dart';
 import '../../data/social_providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/page_kit.dart';
+import '../room/room_sheets.dart';
 
 class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
@@ -84,7 +85,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         SectionTitle(q.isEmpty ? 'Popular rooms' : 'Rooms'),
         for (final (i, r) in filteredRooms.indexed)
           ListTile(
-            onTap: () => context.push('/room', extra: r),
+            onTap: () => openRoom(context, ref, r),
             leading: Container(
               width: 48,
               height: 48,

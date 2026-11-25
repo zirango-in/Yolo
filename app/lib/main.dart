@@ -25,6 +25,7 @@ import 'features/profile/avatar_studio_screen.dart';
 import 'features/profile/edit_profile_screen.dart';
 import 'features/profile/level_badges_screens.dart';
 import 'features/profile/user_profile_screen.dart';
+import 'features/room/create_room_screen.dart';
 import 'features/room/room_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/shop/shop_screen.dart';
@@ -68,6 +69,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/profile/achievements', builder: (_, _) => const BadgesScreen(initialTab: 1)),
       GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
       GoRoute(path: '/room', builder: (_, state) => RoomScreen(room: state.extra! as Room)),
+      GoRoute(path: '/room/create', builder: (_, _) => const CreateRoomScreen()),
       GoRoute(path: '/discover', builder: (_, _) => const DiscoverScreen()),
       GoRoute(path: '/games', builder: (_, _) => const GameCenterScreen()),
       GoRoute(path: '/friends', builder: (_, _) => const FriendsScreen()),
